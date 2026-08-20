@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Where story lives</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600&family=Noto+Serif+KR:wght@300;400;600&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+  <!-- Leaflet.js CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+
+  <style>
+    :root {
+      --bg-cream: #f7f3ed;
+      --bg-card: #fdfbf7;
+      --text-main: #3d352e;
+      --text-sub: #7a7067;
+      --border: #e8e0d5;
+      --shadow: 0 12px 30px rgba(70, 55, 40, 0.09);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-cream);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* 상단 헤더 */
+    header {
+      padding: 14px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      z-index: 1000;
+    }
+
+    .title-group h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text-main);
+      font-family: 'Playfair Display', serif;
+    }
+
+    .title-group p {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      margin-top: 3px;
+    }
+
+    .header-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn-header {
+      background-color: var(--bg-cream);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-header:hover {
+      background-color: #eee7dc;
+      border-color: #c4b5a2;
+    }
+
+    .btn-header.active {
+      background-color: #e5ded2;
+      border-color: #9e5843;
+    }
+
+    /* 지도 영역 */
+    #map-container {
+      flex: 1;
+      position: relative;
+      background: #eee8de;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 따뜻한 아이보리 톤 타일 필터 */
+    .warm-ivory-tile {
+      filter: sepia(35%) saturate(75%) hue-rotate(350deg) brightness(97%) contrast(95%);
+    }
+
+    /* 커스텀 핀 */
+    .custom-pin {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .pin-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      border: 2.5px solid #ffffff;
+      box-shadow: 0 4px 12px rgba(60, 45, 35, 0.35);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pin-icon::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: #ffffff;
+      border-radius: 50%;
+    }
+
+    .custom-pin:hover .pin-icon {
+      transform: rotate(-45deg) scale(1.22);
+    }
+
+    /* Leaflet 컨트롤 */
+    .leaflet-control-zoom {
+      border: none !important;
+      box-shadow: var(--shadow) !important;
+      border-radius: 10px !important;
+      overflow: hidden;
+    }
+
+    .leaflet-control-zoom a {
+      background-color: var(--bg-card) !important;
+      color: var(--text-main) !important;
+      border: 1px solid var(--border) !important;
+      border-bottom: none !important;
+      width: 34px !important;
+      height: 34px !important;
+      line-height: 34px !important;
+      font-size: 16px !important;
+    }
+
+    .leaflet-control-zoom a:hover {
+      background-color: var(--bg-cream) !important;
+    }
+
+    .leaflet-control-attribution {
+      background: rgba(253, 251, 247, 0.75) !important;
+      color: var(--text-sub) !important;
+      font-size: 10px !important;
+      padding: 3px 8px !important;
+      border-radius: 4px;
+      margin: 6px !important;
+    }
+
+    /* =========================================
+       모달 창 (반응형 비율 & 고정 푸터 최적화)
+    ========================================= */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(25, 20, 16, 0.6);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-card {
+      background: var(--bg-card);
+      width: 100%;
+      max-width: 1000px;
+      height: 85vh;
+      max-height: 720px;
+      border-radius: 18px;
+      box-shadow: 0 24px 60px rgba(25, 18, 12, 0.28);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      transform: translateY(20px) scale(0.98);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: translateY(0) scale(1);
+    }
+
+    .btn-close-modal {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      width: 36px;
+      height: 36px;
+      background: rgba(253, 251, 247, 0.92);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      color: var(--text-main);
+      cursor: pointer;
+      z-index: 30;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .btn-close-modal:hover {
+      background: #f0eae1;
+      transform: rotate(90deg) scale(1.05);
+    }
+
+    .modal-body {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* 좌측 이미지 슬라이더 */
+    .modal-media-slider {
+      position: relative;
+      background: #14110f;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    .slide-bg-blur {
+      position: absolute;
+      inset: -20px;
+      background-size: cover;
+      background-position: center;
+      filter: blur(28px) brightness(0.45) saturate(1.2);
+      transform: scale(1.15);
+      z-index: 1;
+      opacity: 0.85;
+      transition: background-image 0.3s ease;
+    }
+
+    .slide-img-wrapper {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+    }
+
+    .slide-img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      display: block;
+      transition: opacity 0.3s ease;
+    }
+
+    .slider-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      background: rgba(253, 251, 247, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      color: var(--text-main);
+      cursor: pointer;
+      z-index: 10;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+    }
+
+    .slider-nav-btn:hover {
+      background: #ffffff;
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .slider-nav-btn.prev { left: 14px; }
+    .slider-nav-btn.next { right: 14px; }
+
+    .slider-bottom-bar {
+      position: absolute;
+      bottom: 14px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .slider-caption {
+      background: rgba(20, 16, 12, 0.78);
+      backdrop-filter: blur(6px);
+      color: #f7f3ed;
+      font-size: 0.75rem;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: 300;
+      max-width: 68%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      pointer-events: auto;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .slider-dots {
+      display: flex;
+      gap: 6px;
+      background: rgba(20, 16, 12, 0.55);
+      padding: 6px 10px;
+      border-radius: 12px;
+      backdrop-filter: blur(6px);
+      pointer-events: auto;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      background: rgba(255, 255, 255, 0.45);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .dot.active {
+      background: #ffffff;
+      width: 18px;
+      border-radius: 4px;
+    }
+
+    /* ★ 우측 콘텐츠 영역 (상단 스크롤 + 하단 상시고정 푸터) */
+    .modal-content-area {
+      padding: 30px 28px 20px 28px;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg-card);
+    }
+
+    /* 본문 스크롤 영역 */
+    .modal-scroll-content {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 6px;
+      margin-bottom: 12px;
+    }
+
+    .modal-scroll-content::-webkit-scrollbar {
+      width: 5px;
+    }
+    .modal-scroll-content::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    .modal-header-tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 10px;
+      letter-spacing: 0.02em;
+    }
+
+    .modal-title {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--text-main);
+      line-height: 1.35;
+      margin-bottom: 6px;
+    }
+
+    .modal-place-name {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      margin-bottom: 18px;
+    }
+
+    .quotes-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      border-top: 1px dashed var(--border);
+      border-bottom: 1px dashed var(--border);
+      padding: 18px 0;
+      margin-bottom: 14px;
+    }
+
+    .quote-item {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 0.88rem;
+      line-height: 1.75;
+      color: #443c34;
+      position: relative;
+      padding-left: 14px;
+      border-left: 2.5px solid;
+      word-break: keep-all;
+    }
+
+    .quote-item.commentary {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.82rem;
+      line-height: 1.65;
+      color: #706458;
+      background: rgba(0, 0, 0, 0.025);
+      padding: 10px 12px;
+      border-radius: 6px;
+      border-left-width: 3px;
+      margin-top: 4px;
+    }
+
+    /* ★ 하단 상시고정 푸터 영역 */
+    .modal-fixed-footer {
+      flex-shrink: 0;
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+    }
+
+    .modal-music-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background-color: var(--bg-cream);
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+    }
+
+    .music-wave-icon {
+      font-size: 1.1rem;
+      animation: soundPulse 1.8s infinite ease-in-out;
+    }
+
+    @keyframes soundPulse {
+      0%, 100% { transform: scale(1); opacity: 0.6; }
+      50% { transform: scale(1.15); opacity: 1; color: #9e5843; }
+    }
+
+    .music-info {
+      flex: 1;
+      font-size: 0.75rem;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .modal-footer-note {
+      font-size: 0.73rem;
+      color: #a3998f;
+      text-align: right;
+    }
+
+    /* 모바일 반응형 */
+    @media (max-width: 860px) {
+      .modal-card {
+        height: 90vh;
+        max-height: 90vh;
+        width: 95%;
+      }
+
+      .modal-body {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+      }
+
+      .modal-media-slider {
+        height: 280px;
+        min-height: 240px;
+      }
+
+      .modal-content-area {
+        padding: 20px 18px 16px 18px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header {
+        padding: 12px 16px;
+      }
+      .title-group h1 {
+        font-size: 1.1rem;
+      }
+      .title-group p {
+        display: none;
+      }
+      .modal-media-slider {
+        height: 220px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 상단 헤더 -->
+  <header>
+    <div class="title-group">
+      <h1>Where story lives</h1>
+      <p>문학과 영화 속 장소로 떠나보세요 · 핀을 누르면 음악과 이야기가 펼쳐집니다</p>
+    </div>
+    
+    <div class="header-controls">
+      <button id="btnToggleBgm" class="btn-header" onclick="toggleMainBgm()">
+        <span id="bgmIcon">🎵</span> <span id="bgmText">배경음악 ON</span>
+      </button>
+      <button class="btn-header" onclick="resetView()">초기 위치로</button>
+    </div>
+  </header>
+
+  <!-- 지도 영역 -->
+  <div id="map-container">
+    <div id="map"></div>
+  </div>
+
+  <!-- 모달 창 -->
+  <div id="storyModal" class="modal-overlay" onclick="handleOverlayClick(event)">
+    <div class="modal-card">
+      <button class="btn-close-modal" onclick="closeModal()">✕</button>
+      <div class="modal-body">
+        
+        <!-- 좌측 이미지 슬라이더 -->
+        <div class="modal-media-slider">
+          <div id="slideBgBlur" class="slide-bg-blur"></div>
+          
+          <div class="slide-img-wrapper">
+            <img id="slideImg" class="slide-img" src="" alt="장소 사진" />
+          </div>
+          
+          <button id="btnPrevSlide" class="slider-nav-btn prev" onclick="prevSlide()">‹</button>
+          <button id="btnNextSlide" class="slider-nav-btn next" onclick="nextSlide()">›</button>
+
+          <div class="slider-bottom-bar">
+            <div id="slideCaption" class="slider-caption"></div>
+            <div id="sliderDots" class="slider-dots"></div>
+          </div>
+        </div>
+
+        <!-- 우측 텍스트 콘텐츠 -->
+        <div class="modal-content-area">
+          <!-- 상단 스크롤 영역 (문장/대사) -->
+          <div class="modal-scroll-content">
+            <span id="modalTag" class="modal-header-tag"></span>
+            <h2 id="modalTitle" class="modal-title"></h2>
+            <div id="modalPlace" class="modal-place-name"></div>
+
+            <div id="modalQuotes" class="quotes-wrapper"></div>
+          </div>
+
+          <!-- 하단 상시고정 푸터 영역 (음악 바 & 컬렉션 노트) -->
+          <div class="modal-fixed-footer">
+            <div id="musicBarContainer" class="modal-music-bar" style="display: none;">
+              <span class="music-wave-icon">🎶</span>
+              <span id="modalMusicTitle" class="music-info">재생 중인 테마곡</span>
+            </div>
+            <div class="modal-footer-note">Where story lives Collection</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet.js 라이브러리 -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+
+  <script>
+    // =========================================================================
+    // 🎵 사운드 시스템
+    // =========================================================================
+
+    const mainBgm = new Audio("main.mp3");
+    mainBgm.loop = true;
+    mainBgm.volume = 0.35;
+    let isMainBgmPlaying = false;
+
+    const placeAudio = new Audio();
+    placeAudio.volume = 0.5;
+
+    function autoStartBgmOnce() {
+      if (!isMainBgmPlaying) {
+        mainBgm.play().then(() => {
+          isMainBgmPlaying = true;
+          updateBgmButtonUI();
+        }).catch(() => {});
+      }
+      document.removeEventListener('click', autoStartBgmOnce);
+    }
+    document.addEventListener('click', autoStartBgmOnce, { once: true });
+
+    function toggleMainBgm() {
+      if (isMainBgmPlaying) {
+        mainBgm.pause();
+        isMainBgmPlaying = false;
+      } else {
+        mainBgm.play().then(() => {
+          isMainBgmPlaying = true;
+        }).catch(() => {});
+      }
+      updateBgmButtonUI();
+    }
+
+    function updateBgmButtonUI() {
+      const btn = document.getElementById('btnToggleBgm');
+      const icon = document.getElementById('bgmIcon');
+      const text = document.getElementById('bgmText');
+      if (isMainBgmPlaying) {
+        btn.classList.add('active');
+        icon.textContent = '🎵';
+        text.textContent = '배경음악 ON';
+      } else {
+        btn.classList.remove('active');
+        icon.textContent = '🔇';
+        text.textContent = '배경음악 OFF';
+      }
+    }
+
+    // =========================================================================
+    // 🗺️ 지도 및 8곳 여행지 데이터 세팅
+    // =========================================================================
+
+    const initialCenter = [30.0, 35.0];
+    const initialZoom = 2.7;
+
+    const map = L.map('map', {
+      center: initialCenter,
+      zoom: initialZoom,
+      minZoom: 2,
+      maxZoom: 16,
+      zoomControl: true,
+      attributionControl: true
+    });
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 19,
+      className: 'warm-ivory-tile'
+    }).addTo(map);
+
+    const storyPlaces = [
+      // 1. 설국
+      {
+        id: "snow-country",
+        name: "일본 니가타현 에치고 유자와 온천마을",
+        type: "book",
+        workTitle: "가와바타 야스나리 《설국》",
+        latlng: [36.9358, 138.8106],
+        pinColor: "#4e6a82",
+        tagBg: "#e2ecf4",
+        tagColor: "#324d63",
+        audioSrc: "snow.mp3",
+        audioTitle: "설국 테마 (snow.mp3)",
+        startTime: 0,
+        photos: [
+          { url: "snow1.jpg", caption: "1. 눈 내리는 간이역과 전신주 가로등" },
+          { url: "snow2.jpg", caption: "2. 다다미 방 창 너머 펼쳐진 설경" },
+          { url: "snow3.jpg", caption: "3. 누각의 등불과 눈 덮인 겨울 숲" },
+          { url: "snow4.jpg", caption: "4. 눈 내린 밤의 돌계단과 등롱" }
+        ],
+        quotes: [
+          "국경의 긴 터널을 빠져나오자, 눈의 고장이었다. 밤의 밑바닥이 하얘졌다.",
+          "온 마음을 바친 사랑의 흔적은 그 어느 때고 미지의 장소에서 사람을 감동시키고야 마는 것일까?",
+          "\"당신은 절 좋은 여자라고 하셨죠? 떠날 사람이 왜 그런 말을 하신 거예요? 울었어요. 집에 돌아가서도 울었어요. 헤어지는 게 무서워요. 하지만 어서 가버려요. 그 말 듣고 울었던 걸 잊진 않을 테니까.\""
+        ]
+      },
+      // 2. 인간 실격
+      {
+        id: "no-longer-human",
+        name: "일본 아오모리현",
+        type: "book",
+        workTitle: "다자이 오사무 《인간 실격》",
+        latlng: [40.8244, 140.7400],
+        pinColor: "#c26d7b",
+        tagBg: "#faeaed",
+        tagColor: "#8f3f4c",
+        audioSrc: "blossom.mp3",
+        audioTitle: "One more time, One more chance (blossom.mp3)",
+        startTime: 0,
+        photos: [
+          { url: "blossom4.jpg", caption: "1. 붉은 다리와 물가에 비친 만개한 벚꽃" },
+          { url: "blossom1.jpg", caption: "2. 밤하늘 아래 물가에 드리운 벚꽃과 은은한 불빛" },
+          { url: "blossom2.jpg", caption: "3. 벚꽃 터널 속을 달리는 완행열차" },
+          { url: "blossom3.jpg", caption: "4. 설산을 배경으로 햇살 아래 서 있는 벚나무" }
+        ],
+        quotes: [
+          "바닷가. 파도가 밀려와 부서지는 곳이라 해도 좋을 만큼 바다와 가까운 해안가. 시커먼 줄기에 우람한 덩치의 산벚나무가 스무그루 넘게 줄지어 서서, 새 학년이 시작될 때면 갈색의 끈끈한 어린잎과 함께 파란 바다를 배경으로 눈부신 꽃을 피우고, 꽃잎이 눈처럼 흩날리는 시기가 찾아오면 수없이 많은 꽃잎이 바다에 떨어져 물 위를 수놓으며 떠돌다 파도를 타고 다시 물가로 되돌아오는 곳. 그 벚나무 모래톱을 고스란히 교정으로 사용하는 도호쿠 지방의 한 중학교에 저는 제대로 시험공부도 하지 않은 채 입학했습니다. 그 중학교의 모자 휘장과 교복 단추에도 도안화한 벚꽃이 피어있었습니다."
+        ]
+      },
+      // 3. 콜 미 바이 유어 네임
+      {
+        id: "cmbyn",
+        name: "이탈리아 북부 롬바르디아 지방",
+        type: "movie",
+        workTitle: "루카 구아다니노 《콜 미 바이 유어 네임》",
+        latlng: [45.4791, 9.8452],
+        pinColor: "#c26b38",
+        tagBg: "#faebe3",
+        tagColor: "#8c441b",
+        audioSrc: "peach.mp3",
+        audioTitle: "Mystery of Love (peach.mp3)",
+        startTime: 0,
+        photos: [
+          { url: "peach1.jpg", caption: "1. 햇살 아래 싱그러운 과수원의 복숭아" },
+          { url: "peach2.jpg", caption: "2. 풀밭에 누워 여름 햇살을 만끽하던 순간" },
+          { url: "peach3.jpg", caption: "3. 크레마 마을 광장에서의 잔잔한 대화" },
+          { url: "peach4.jpg", caption: "4. 찬란하고 나른한 오후의 수영장 썬베드" }
+        ],
+        quotes: [
+          "\"Is it better to speak or die?\"\n(말하는 것이 나은가, 죽는 게 나은가?)",
+          "\"Cause I wanted you to know… Cause I wanted you to know…\"\n(당신이 알아줬으면 해서… 알아줬으면 해서…)",
+          "\"Call me by your name and I’ll call you by mine.\"\n(네 이름으로 날 불러줘, 내 이름으로 널 부를게.)",
+          "\"Elio. Elio, Elio, Elio, Elio, Elio…\"\n(엘리오. 엘리오, 엘리오, 엘리오, 엘리오, 엘리오…)\n\n\"Oliver. I remember everything.\"\n(올리버. 나도 모든 걸 기억해.)"
+        ]
+      },
+      // 4. 셜록
+      {
+        id: "sherlock",
+        name: "영국 런던 베이커 스트리트 221B",
+        type: "drama",
+        workTitle: "BBC 드라마 《셜록 (Sherlock)》",
+        latlng: [51.5237, -0.1585],
+        pinColor: "#6a2e35",
+        tagBg: "#f5e6e8",
+        tagColor: "#521d23",
+        audioSrc: "sherlock.mp3",
+        audioTitle: "셜록 테마 (sherlock.mp3)",
+        startTime: 0,
+        photos: [
+          { url: "sherlock1.jpg", caption: "1. 221B 베이커 가 문 앞의 셜록 홈즈" },
+          { url: "sherlock2.jpg", caption: "2. Speedy's 카페 앞 블랙캡과 셜록 & 존 왓슨" },
+          { url: "sherlock3.jpg", caption: "3. 빅벤과 런던의 하늘을 등진 모리아티" },
+          { url: "sherlock4.jpg", caption: "4. 비 내리는 웨스트민스터 다리와 빨간 공중전화부스" },
+          { url: "sherlock5.jpg", caption: "5. 아이린의 스마트폰 잠금화면 'I AM SHERLOCKED'" }
+        ],
+        quotes: [
+          "\"I'm not a psychopath, Anderson. I'm a high-functioning sociopath. Do your research.\"\n(난 사이코패스가 아니야 앤더슨. 고지능 소시오패스지. 공부 좀 해.)",
+          "\"Sentiment is a chemical defect found in the losing side.\"\n(감정은 패자에게서 발견되는 화학적 결함이지.)",
+          "\"You don't actually think I was interested in you. Why? Because you're the great Sherlock Holmes, the clever detective in the funny hat?\"\n(혹시 내가 정말 당신에게 관심이 있었다고 생각하는 건 아니죠? 왜요? 당신이 이상한 모자를 쓰고 다니는 똑똑한 탐정, 위대한 셜록홈즈라서?)\n\n\"No, because I took your pulse.\"\n(아니, 당신의 맥박을 쟀거든.)"
+        ]
+      },
+      // 5. 화양연화
+      {
+        id: "in-the-mood-for-love",
+        name: "홍콩 센트럴 구시가지 골목길",
+        type: "movie",
+        workTitle: "왕가위 《화양연화 (花樣年華)》",
+        latlng: [22.2830, 114.1536],
+        pinColor: "#9b2226",
+        tagBg: "#fae8e8",
+        tagColor: "#781418",
+        audioSrc: "love.mp3",
+        audioTitle: "Yumeji's Theme (love.mp3)",
+        startTime: 0,
+        photos: [
+          { url: "love1.jpg", caption: "1. 거울에 비친 두 사람과 붉은 벽지의 식당" },
+          { url: "love2.jpg", caption: "2. 밤 골목 가로등 아래 스쳐 지나가는 순간" },
+          { url: "love3.jpg", caption: "3. 어둠 속에서 조심스레 맞잡은 두 손" },
+          { url: "love4.jpg", caption: "4. 택시 안에서 서로의 온기에 기대던 밤" }
+        ],
+        quotes: [
+          "\"화양연화(花樣年華), 인생에서 가장 아름답고 행복한 순간.\"",
+          "\"그 시절은 지나갔고, 이제 거기 남은 것은 아무것도 없다.\"",
+          "\"배표 한 장 더 있으면, 나와 같이 갈래요?\"\n\"배표 한 장 더 있으면, 날 데려갈래요?\"",
+          "말하지 못한 사랑, 지나간 시간, 이미 늦어버린 사랑. 결국 화양연화는 사랑 영화가 아니라 지나가 버린 인생의 순간에 대한 영화였다는 걸 뒤늦게 깨닫게 됩니다."
+        ]
+      },
+      // 6. 헤어질 결심
+      {
+        id: "decision-to-leave",
+        name: "대한민국 순천 송광사 (촬영지: 송광사 & 삼척 부남해수욕장)",
+        type: "movie",
+        workTitle: "박찬욱 《헤어질 결심 (Decision to Leave)》",
+        latlng: [34.9961, 127.2736],
+        pinColor: "#205560",
+        tagBg: "#e3eff1",
+        tagColor: "#163f47",
+        audioSrc: "leave.mp3",
+        audioTitle: "정훈희 & 송창식 - 안개 (leave.mp3)",
+        startTime: 0,
+        photos: [
+          { url: "leave1.jpg", caption: "1. 비 내리는 송광사에서 우산을 함께 쓴 순간" },
+          { url: "leave2.jpg", caption: "2. 송광사 종루의 커다란 법고를 사이에 두고 마주 선 두 사람" },
+          { url: "leave3.jpg", caption: "3. 일몰의 삼척 부남해변에서 슬픔에 젖은 해준" },
+          { url: "leave4.jpg", caption: "4. 밀려오는 만조의 바다를 홀로 응시하는 서래의 뒷모습" }
+        ],
+        quotes: [
+          "\"내가 그렇게 만만합니까?\"\n\"내가 그렇게 나쁩니까?\"",
+          "\"날 사랑한다고 말하는 순간 당신의 사랑이 끝났고, 당신의 사랑이 끝나는 순간 내 사랑이 시작됐죠.\"",
+          "\"나 너 땜에 고생 깨나 했지만, 사실 너 아니었으면 내 인생 공허했다, 요렇게 좀 전해주세요.\"",
+          "\"바다에 버려요. 깊은 데 빠뜨려서, 아무도 못 찾게 해요.\""
+        ]
+      },
+      // 7. 여름
+      {
+        id: "summer",
+        name: "미국 뉴잉글랜드 버크셔 지방",
+        type: "book",
+        workTitle: "이디스 워튼 《여름》",
+        latlng: [42.3458, -73.2384],
+        pinColor: "#6c804b",
+        tagBg: "#edf3e5",
+        tagColor: "#47592f",
+        audioSrc: "summer.mp3",
+        audioTitle: "여름 테마 (summer.mp3)",
+        startTime: 0,
+        photos: [
+          { url: "summer1.jpg", caption: "1. 햇살에 반짝이는 잔잔한 호숫가의 윤슬" },
+          { url: "summer2.jpg", caption: "2. 여름 햇살이 쏟아지는 들판의 야생화들" },
+          { url: "summer3.jpg", caption: "3. 맑은 호수와 푸른 숲을 잇는 고풍스러운 돌다리" },
+          { url: "summer4.jpg", caption: "4. 나무 그늘 아래 풀밭에 누워 책을 읽던 오후" }
+        ],
+        quotes: [
+          "채리티는 아직 모르는 게 많은 데다 감각이 무뎠는데, 그런 사실도 어렴풋하게만 알고있었다. 그러나 빛이며 공기, 향기, 색깔 같은 것들에 대해서는 몸속에 흐르는 피 한 방울 한 방울이 민감하게 반응했다. 그녀는 손바닥에 투박스럽게 느껴지는 산자락의 마른 풀이며 얼굴을 짓누르는 백리향 냄새, 머리카락과 면 블라우스 속을 스쳐 가는 바람, 솔송나무가 바람결에 흔들리면서 내는 삐걱거리는 소리를 좋아했다.",
+          "잠시 그것에 대해 생각하지 않을 때면 채리티는 풀밭에 누워 너무 오랫동안 하늘을 올려다본 뒤 이따금 느꼈던 기분을 경험했다. 그녀의 두 눈이 너무나 밝은 빛으로 가득 차 있어 주위의 모든 것이 하나같이 희뿌옇게 보였다.",
+          "봄이 온갖 생명이 겨울잠에서 깨어나 기지개를 켜는 계절이고, 한여름이 무럭무럭 생장하여 활짝 꽃을 피우는 계절이라면, 가을은 결실을 맺고 조락하는 계절이다. 자연의 일부인 인간도 마찬가지서 채리티는 가을에 이르러서 비로소 성숙한 모습을 보여 준다. 한여름 동안 루시어스 하니를 사랑하고 이별의 고통과 절망을 겪었기에 더욱더 성숙한 인간으로 발전할 수 있다."
+        ]
+      },
+      // 8. 라라랜드
+      {
+        id: "lalaland",
+        name: "미국 로스앤젤레스",
+        type: "movie",
+        workTitle: "데이미언 셔젤 《라라랜드 (La La Land)》",
+        latlng: [34.0522, -118.2437],
+        pinColor: "#69487d",
+        tagBg: "#f1eaf7",
+        tagColor: "#4c2e5e",
+        audioSrc: "lalaland.mp3",
+        audioTitle: "라라랜드 테마 (lalaland.mp3)",
+        startTime: 0,
+        photos: [
+          { url: "lalaland1.jpg", caption: "1. 보랏빛 매직아워의 언덕 벤치와 탭댄스" },
+          { url: "lalaland2.jpg", caption: "2. 콜로라도 스트리트 브릿지를 함께 거닐던 저녁" },
+          { url: "lalaland3.jpg", caption: "3. 황금빛 석양이 부서지는 낭만의 해변" },
+          { url: "lalaland4.jpg", caption: "4. 푸른 야자수 너머로 올려다본 할리우드 언덕" }
+        ],
+        quotes: [
+          "\"Where are we?\"\n(우린 지금 어디쯤 있는 걸까?)\n\n\"Just wait and see.\"\n(그냥 흘러가는 대로 지켜보자.)",
+          "\"Here's to the ones who dream, foolish as they may seem.\"\n(꿈꾸는 이들을 위하여, 비록 바보처럼 보일지라도.)",
+          "\"I'm always gonna love you.\"\n(언제나 널 사랑할 거야.)\n\n\"I'm always gonna love you, too.\"\n(나도 언제나 널 사랑할 거야.)"
+        ]
+      }
+    ];
+
+    // 지도 위에 핀 추가
+    storyPlaces.forEach(item => {
+      const customIcon = L.divIcon({
+        className: 'custom-pin',
+        html: `<div class="pin-icon" style="background-color: ${item.pinColor};"></div>`,
+        iconSize: [28, 28],
+        iconAnchor: [14, 28]
+      });
+
+      const marker = L.marker(item.latlng, { icon: customIcon }).addTo(map);
+
+      marker.on('click', () => {
+        openStoryModal(item);
+      });
+    });
+
+    // 모달 제어 로직
+    const modal = document.getElementById('storyModal');
+    const slideImg = document.getElementById('slideImg');
+    const slideBgBlur = document.getElementById('slideBgBlur');
+    const slideCaption = document.getElementById('slideCaption');
+    const sliderDots = document.getElementById('sliderDots');
+    const btnPrevSlide = document.getElementById('btnPrevSlide');
+    const btnNextSlide = document.getElementById('btnNextSlide');
+
+    const modalTag = document.getElementById('modalTag');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalPlace = document.getElementById('modalPlace');
+    const modalQuotes = document.getElementById('modalQuotes');
+    const musicBarContainer = document.getElementById('musicBarContainer');
+    const modalMusicTitle = document.getElementById('modalMusicTitle');
+
+    let currentPhotos = [];
+    let currentPhotoIndex = 0;
+
+    function openStoryModal(item) {
+      currentPhotos = item.photos || [];
+      currentPhotoIndex = 0;
+
+      modalTag.textContent = item.type === 'book' ? '소설 속 문장 & 실제 장소' : (item.type === 'drama' ? '드라마 속 명대사 & 장면' : '영화 속 명대사 & 장면');
+      modalTag.style.backgroundColor = item.tagBg;
+      modalTag.style.color = item.tagColor;
+
+      modalTitle.textContent = item.workTitle;
+      modalPlace.textContent = `📍 ${item.name}`;
+
+      // 문장 렌더링
+      modalQuotes.innerHTML = '';
+      item.quotes.forEach((quote, idx) => {
+        const quoteEl = document.createElement('div');
+        
+        if ((item.id === "in-the-mood-for-love" || item.id === "summer") && idx === item.quotes.length - 1) {
+          quoteEl.className = 'quote-item commentary';
+          quoteEl.style.borderLeftColor = item.pinColor;
+        } else {
+          quoteEl.className = 'quote-item';
+          quoteEl.style.borderLeftColor = item.pinColor;
+        }
+
+        quoteEl.innerHTML = quote.replace(/\n/g, '<br>');
+        modalQuotes.appendChild(quoteEl);
+      });
+
+      // 여행지 전용 MP3 재생
+      if (item.audioSrc) {
+        musicBarContainer.style.display = 'flex';
+        modalMusicTitle.textContent = `재생 중: ${item.audioTitle || item.audioSrc}`;
+
+        if (isMainBgmPlaying) {
+          mainBgm.pause();
+        }
+
+        placeAudio.src = item.audioSrc;
+        placeAudio.currentTime = item.startTime || 0;
+        placeAudio.play().catch(() => {});
+      } else {
+        musicBarContainer.style.display = 'none';
+        placeAudio.pause();
+      }
+
+      renderSlide();
+      modal.classList.add('active');
+    }
+
+    function renderSlide() {
+      if (currentPhotos.length === 0) return;
+
+      const current = currentPhotos[currentPhotoIndex];
+      slideImg.src = current.url;
+      slideBgBlur.style.backgroundImage = `url('${current.url}')`;
+      slideCaption.textContent = current.caption;
+
+      if (currentPhotos.length > 1) {
+        btnPrevSlide.style.display = 'flex';
+        btnNextSlide.style.display = 'flex';
+        sliderDots.style.display = 'flex';
+
+        sliderDots.innerHTML = '';
+        currentPhotos.forEach((_, idx) => {
+          const dot = document.createElement('div');
+          dot.className = `dot ${idx === currentPhotoIndex ? 'active' : ''}`;
+          dot.onclick = () => goToSlide(idx);
+          sliderDots.appendChild(dot);
+        });
+      } else {
+        btnPrevSlide.style.display = 'none';
+        btnNextSlide.style.display = 'none';
+        sliderDots.style.display = 'none';
+      }
+    }
+
+    function prevSlide() {
+      if (currentPhotos.length <= 1) return;
+      currentPhotoIndex = (currentPhotoIndex - 1 + currentPhotos.length) % currentPhotos.length;
+      renderSlide();
+    }
+
+    function nextSlide() {
+      if (currentPhotos.length <= 1) return;
+      currentPhotoIndex = (currentPhotoIndex + 1) % currentPhotos.length;
+      renderSlide();
+    }
+
+    function goToSlide(idx) {
+      currentPhotoIndex = idx;
+      renderSlide();
+    }
+
+    function closeModal() {
+      modal.classList.remove('active');
+      
+      placeAudio.pause();
+      placeAudio.currentTime = 0;
+
+      if (isMainBgmPlaying) {
+        mainBgm.play().catch(() => {});
+      }
+    }
+
+    function handleOverlayClick(event) {
+      if (event.target === modal) {
+        closeModal();
+      }
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (!modal.classList.contains('active')) return;
+      if (e.key === 'Escape') closeModal();
+      if (e.key === 'ArrowLeft') prevSlide();
+      if (e.key === 'ArrowRight') nextSlide();
+    });
+
+    function resetView() {
+      map.flyTo(initialCenter, initialZoom, { duration: 1.2 });
+    }
+  </script>
+</body>
+</html>
