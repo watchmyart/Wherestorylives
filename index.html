@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Where story lives</title>
 
   <!-- Google Fonts -->
@@ -33,6 +33,7 @@
       padding: 0;
       box-sizing: border-box;
       font-family: 'Noto Sans KR', sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
@@ -182,12 +183,12 @@
     }
 
     /* =========================================
-       모달 창 (반응형 비율 & 고정 푸터 최적화)
+       모달 창 스타일 (PC / 태블릿 / 모바일 최적화)
     ========================================= */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(25, 20, 16, 0.6);
+      background: rgba(25, 20, 16, 0.65);
       backdrop-filter: blur(8px);
       display: flex;
       align-items: center;
@@ -209,7 +210,7 @@
       width: 100%;
       max-width: 1000px;
       height: 85vh;
-      max-height: 720px;
+      max-height: 740px;
       border-radius: 18px;
       box-shadow: 0 24px 60px rgba(25, 18, 12, 0.28);
       border: 1px solid var(--border);
@@ -257,7 +258,7 @@
       overflow: hidden;
     }
 
-    /* 좌측 이미지 슬라이더 */
+    /* 좌측 이미지 슬라이더 (비율 보존 & 앰비언트 블러) */
     .modal-media-slider {
       position: relative;
       background: #14110f;
@@ -386,7 +387,7 @@
       border-radius: 4px;
     }
 
-    /* ★ 우측 콘텐츠 영역 (상단 스크롤 + 하단 상시고정 푸터) */
+    /* 우측 텍스트 콘텐츠 영역 (상단 스크롤 + 하단 고정 푸터) */
     .modal-content-area {
       padding: 30px 28px 20px 28px;
       display: flex;
@@ -396,7 +397,6 @@
       background: var(--bg-card);
     }
 
-    /* 본문 스크롤 영역 */
     .modal-scroll-content {
       flex: 1;
       overflow-y: auto;
@@ -422,18 +422,29 @@
       letter-spacing: 0.02em;
     }
 
-    .modal-title {
-      font-size: 1.35rem;
+    /* ★ 작가명 & 작품 제목 분리 스타일 */
+    .modal-author-name {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-sub);
+      margin-bottom: 3px;
+      letter-spacing: -0.01em;
+    }
+
+    .modal-work-title {
+      font-size: 1.4rem;
       font-weight: 600;
       color: var(--text-main);
       line-height: 1.35;
       margin-bottom: 6px;
+      word-break: keep-all;
     }
 
     .modal-place-name {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: var(--text-sub);
       margin-bottom: 18px;
+      word-break: keep-all;
     }
 
     .quotes-wrapper {
@@ -469,7 +480,7 @@
       margin-top: 4px;
     }
 
-    /* ★ 하단 상시고정 푸터 영역 */
+    /* 하단 고정 푸터 */
     .modal-fixed-footer {
       flex-shrink: 0;
       border-top: 1px solid var(--border);
@@ -512,12 +523,19 @@
       text-align: right;
     }
 
-    /* 모바일 반응형 */
+    /* =========================================
+       📱 모바일 & 태블릿 화면 가득 채우는 반응형
+    ========================================= */
     @media (max-width: 860px) {
+      .modal-overlay {
+        padding: 10px;
+      }
+
       .modal-card {
-        height: 90vh;
-        max-height: 90vh;
-        width: 95%;
+        height: 94vh;
+        max-height: 94vh;
+        width: 100%;
+        border-radius: 16px;
       }
 
       .modal-body {
@@ -525,13 +543,23 @@
         grid-template-rows: auto 1fr;
       }
 
+      /* 모바일에서 사진이 가로 화면에 시원하게 밀착되도록 조정 */
       .modal-media-slider {
-        height: 280px;
-        min-height: 240px;
+        height: 320px;
+        min-height: 260px;
+        width: 100%;
+      }
+
+      .slide-img-wrapper {
+        padding: 8px;
       }
 
       .modal-content-area {
-        padding: 20px 18px 16px 18px;
+        padding: 18px 16px 14px 16px;
+      }
+
+      .modal-work-title {
+        font-size: 1.25rem;
       }
     }
 
@@ -546,7 +574,7 @@
         display: none;
       }
       .modal-media-slider {
-        height: 220px;
+        height: 260px;
       }
     }
   </style>
@@ -598,16 +626,18 @@
 
         <!-- 우측 텍스트 콘텐츠 -->
         <div class="modal-content-area">
-          <!-- 상단 스크롤 영역 (문장/대사) -->
+          <!-- 상단 스크롤 영역 -->
           <div class="modal-scroll-content">
             <span id="modalTag" class="modal-header-tag"></span>
-            <h2 id="modalTitle" class="modal-title"></h2>
+            <!-- 작가명 & 작품명 분리 표시 -->
+            <div id="modalAuthor" class="modal-author-name"></div>
+            <h2 id="modalTitle" class="modal-work-title"></h2>
             <div id="modalPlace" class="modal-place-name"></div>
 
             <div id="modalQuotes" class="quotes-wrapper"></div>
           </div>
 
-          <!-- 하단 상시고정 푸터 영역 (음악 바 & 컬렉션 노트) -->
+          <!-- 하단 상시 고정 푸터 -->
           <div class="modal-fixed-footer">
             <div id="musicBarContainer" class="modal-music-bar" style="display: none;">
               <span class="music-wave-icon">🎶</span>
@@ -630,15 +660,18 @@
 
   <script>
     // =========================================================================
-    // 🎵 사운드 시스템
+    // 🎵 사운드 시스템 (무한 반복 loop 적용)
     // =========================================================================
 
+    // 메인 BGM (main.mp3)
     const mainBgm = new Audio("main.mp3");
     mainBgm.loop = true;
     mainBgm.volume = 0.35;
     let isMainBgmPlaying = false;
 
+    // ★ 여행지 전용 오디오 (placeAudio) 무한 반복 재생 활성화
     const placeAudio = new Audio();
+    placeAudio.loop = true; // 무한 반복 재생
     placeAudio.volume = 0.5;
 
     function autoStartBgmOnce() {
@@ -680,7 +713,7 @@
     }
 
     // =========================================================================
-    // 🗺️ 지도 및 8곳 여행지 데이터 세팅
+    // 🗺️ 지도 및 8곳 여행지 데이터 세팅 (작가명 & 작품명 분리)
     // =========================================================================
 
     const initialCenter = [30.0, 35.0];
@@ -708,7 +741,8 @@
         id: "snow-country",
         name: "일본 니가타현 에치고 유자와 온천마을",
         type: "book",
-        workTitle: "가와바타 야스나리 《설국》",
+        author: "가와바타 야스나리 소설",
+        title: "《설국》",
         latlng: [36.9358, 138.8106],
         pinColor: "#4e6a82",
         tagBg: "#e2ecf4",
@@ -733,7 +767,8 @@
         id: "no-longer-human",
         name: "일본 아오모리현",
         type: "book",
-        workTitle: "다자이 오사무 《인간 실격》",
+        author: "다자이 오사무 소설",
+        title: "《인간 실격》",
         latlng: [40.8244, 140.7400],
         pinColor: "#c26d7b",
         tagBg: "#faeaed",
@@ -756,7 +791,8 @@
         id: "cmbyn",
         name: "이탈리아 북부 롬바르디아 지방",
         type: "movie",
-        workTitle: "루카 구아다니노 《콜 미 바이 유어 네임》",
+        author: "루카 구아다니노 감독",
+        title: "《콜 미 바이 유어 네임》",
         latlng: [45.4791, 9.8452],
         pinColor: "#c26b38",
         tagBg: "#faebe3",
@@ -782,7 +818,8 @@
         id: "sherlock",
         name: "영국 런던 베이커 스트리트 221B",
         type: "drama",
-        workTitle: "BBC 드라마 《셜록 (Sherlock)》",
+        author: "BBC 드라마 시리즈",
+        title: "《셜록 (Sherlock)》",
         latlng: [51.5237, -0.1585],
         pinColor: "#6a2e35",
         tagBg: "#f5e6e8",
@@ -808,7 +845,8 @@
         id: "in-the-mood-for-love",
         name: "홍콩 센트럴 구시가지 골목길",
         type: "movie",
-        workTitle: "왕가위 《화양연화 (花樣年華)》",
+        author: "왕가위 감독",
+        title: "《화양연화 (花樣年華)》",
         latlng: [22.2830, 114.1536],
         pinColor: "#9b2226",
         tagBg: "#fae8e8",
@@ -834,7 +872,8 @@
         id: "decision-to-leave",
         name: "대한민국 순천 송광사 (촬영지: 송광사 & 삼척 부남해수욕장)",
         type: "movie",
-        workTitle: "박찬욱 《헤어질 결심 (Decision to Leave)》",
+        author: "박찬욱 감독",
+        title: "《헤어질 결심 (Decision to Leave)》",
         latlng: [34.9961, 127.2736],
         pinColor: "#205560",
         tagBg: "#e3eff1",
@@ -860,7 +899,8 @@
         id: "summer",
         name: "미국 뉴잉글랜드 버크셔 지방",
         type: "book",
-        workTitle: "이디스 워튼 《여름》",
+        author: "이디스 워튼 소설",
+        title: "《여름 (Summer)》",
         latlng: [42.3458, -73.2384],
         pinColor: "#6c804b",
         tagBg: "#edf3e5",
@@ -885,7 +925,8 @@
         id: "lalaland",
         name: "미국 로스앤젤레스",
         type: "movie",
-        workTitle: "데이미언 셔젤 《라라랜드 (La La Land)》",
+        author: "데이미언 셔젤 감독",
+        title: "《라라랜드 (La La Land)》",
         latlng: [34.0522, -118.2437],
         pinColor: "#69487d",
         tagBg: "#f1eaf7",
@@ -933,6 +974,7 @@
     const btnNextSlide = document.getElementById('btnNextSlide');
 
     const modalTag = document.getElementById('modalTag');
+    const modalAuthor = document.getElementById('modalAuthor');
     const modalTitle = document.getElementById('modalTitle');
     const modalPlace = document.getElementById('modalPlace');
     const modalQuotes = document.getElementById('modalQuotes');
@@ -950,7 +992,9 @@
       modalTag.style.backgroundColor = item.tagBg;
       modalTag.style.color = item.tagColor;
 
-      modalTitle.textContent = item.workTitle;
+      // ★ 작가명과 작품 제목을 분리하여 줄바꿈 렌더링
+      modalAuthor.textContent = item.author || '';
+      modalTitle.textContent = item.title || '';
       modalPlace.textContent = `📍 ${item.name}`;
 
       // 문장 렌더링
@@ -970,7 +1014,7 @@
         modalQuotes.appendChild(quoteEl);
       });
 
-      // 여행지 전용 MP3 재생
+      // 여행지 전용 MP3 무한 반복 재생
       if (item.audioSrc) {
         musicBarContainer.style.display = 'flex';
         modalMusicTitle.textContent = `재생 중: ${item.audioTitle || item.audioSrc}`;
