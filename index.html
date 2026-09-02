@@ -3,20 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
   <title>Where story lives</title>
 
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600&family=Noto+Serif+KR:wght@300;400;600&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
 
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600&family=Noto+Serif+KR:wght@300;400;600&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap"
+    rel="stylesheet"
+  >
+
+  <!-- Leaflet -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    integrity="sha256-p4NxAoJBhIINfQyR5B3D5e5hZf6rXJw5cQ3jv1g1V5E="
     crossorigin=""
   />
 
   <style>
+
     :root {
       --bg-cream: #f7f3ed;
       --bg-card: #fdfbf7;
@@ -35,13 +43,17 @@
     }
 
     body {
-      background-color: var(--bg-cream);
+      background: var(--bg-cream);
       color: var(--text-main);
       display: flex;
       flex-direction: column;
       height: 100vh;
       overflow: hidden;
     }
+
+    /* =========================
+       HEADER
+    ========================= */
 
     header {
       padding: 14px 28px;
@@ -56,7 +68,6 @@
     .title-group h1 {
       font-size: 1.25rem;
       font-weight: 600;
-      letter-spacing: -0.01em;
       color: var(--text-main);
       font-family: 'Playfair Display', serif;
     }
@@ -74,7 +85,7 @@
     }
 
     .btn-header {
-      background-color: var(--bg-cream);
+      background: var(--bg-cream);
       border: 1px solid var(--border);
       color: var(--text-main);
       padding: 8px 14px;
@@ -83,32 +94,21 @@
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s ease;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
     .btn-header:hover {
-      background-color: #eee7dc;
+      background: #eee7dc;
       border-color: #c4b5a2;
     }
 
     .btn-header.active {
-      background-color: #e5ded2;
+      background: #e5ded2;
       border-color: #9e5843;
     }
 
-    .btn-add-story {
-      background: #9e5843;
-      color: white;
-      border-color: #9e5843;
-    }
-
-    .btn-add-story:hover {
-      background: #864734;
-      border-color: #864734;
-    }
+    /* =========================
+       MAP
+    ========================= */
 
     #map-container {
       flex: 1;
@@ -122,8 +122,17 @@
     }
 
     .warm-ivory-tile {
-      filter: sepia(35%) saturate(75%) hue-rotate(350deg) brightness(97%) contrast(95%);
+      filter:
+        sepia(35%)
+        saturate(75%)
+        hue-rotate(350deg)
+        brightness(97%)
+        contrast(95%);
     }
+
+    /* =========================
+       PIN
+    ========================= */
 
     .custom-pin {
       position: relative;
@@ -137,7 +146,7 @@
       transform: rotate(-45deg);
       border: 2.5px solid #ffffff;
       box-shadow: 0 4px 12px rgba(60, 45, 35, 0.35);
-      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: transform 0.25s ease;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -155,197 +164,57 @@
       transform: rotate(-45deg) scale(1.22);
     }
 
-    .leaflet-control-zoom {
-      border: none !important;
-      box-shadow: var(--shadow) !important;
-      border-radius: 10px !important;
-      overflow: hidden;
-    }
-
-    .leaflet-control-zoom a {
-      background-color: var(--bg-card) !important;
-      color: var(--text-main) !important;
-      border: 1px solid var(--border) !important;
-      border-bottom: none !important;
-      width: 34px !important;
-      height: 34px !important;
-      line-height: 34px !important;
-      font-size: 16px !important;
-    }
-
-    .leaflet-control-zoom a:hover {
-      background-color: var(--bg-cream) !important;
-    }
-
-    .leaflet-control-attribution {
-      background: rgba(253, 251, 247, 0.75) !important;
-      color: var(--text-sub) !important;
-      font-size: 10px !important;
-      padding: 3px 8px !important;
-      border-radius: 4px;
-      margin: 6px !important;
-    }
-
     /* =========================
-       스토리 추가 모달
+       여러 이야기가 있는 장소
     ========================= */
 
-    .add-modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(25, 20, 16, 0.65);
-      backdrop-filter: blur(8px);
+    .story-cluster-pin {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #806653;
+      border: 3px solid white;
+      box-shadow: 0 5px 15px rgba(60,45,35,.35);
+
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 3000;
-      opacity: 0;
-      visibility: hidden;
-      transition: 0.25s ease;
-      padding: 20px;
-    }
 
-    .add-modal-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .add-modal {
-      width: 100%;
-      max-width: 560px;
-      max-height: 90vh;
-      overflow-y: auto;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 28px;
-      box-shadow: 0 24px 60px rgba(25, 18, 12, 0.28);
-      position: relative;
-    }
-
-    .add-modal h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.5rem;
-      margin-bottom: 5px;
-    }
-
-    .add-modal-description {
-      color: var(--text-sub);
-      font-size: 0.8rem;
-      margin-bottom: 22px;
-    }
-
-    .form-group {
-      margin-bottom: 15px;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 0.8rem;
-      font-weight: 500;
-      margin-bottom: 7px;
-      color: var(--text-main);
-    }
-
-    .form-group input,
-    .form-group textarea {
-      width: 100%;
-      border: 1px solid var(--border);
-      background: #fffdf9;
-      color: var(--text-main);
-      border-radius: 8px;
-      padding: 11px 12px;
-      font-size: 0.85rem;
-      outline: none;
-      transition: 0.2s;
-    }
-
-    .form-group input:focus,
-    .form-group textarea:focus {
-      border-color: #b98a76;
-      box-shadow: 0 0 0 3px rgba(158, 88, 67, 0.08);
-    }
-
-    .form-group textarea {
-      min-height: 120px;
-      resize: vertical;
-      line-height: 1.6;
-    }
-
-    .coordinate-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .file-input-wrapper {
-      border: 1px dashed #cdbfaf;
-      background: #faf7f1;
-      border-radius: 8px;
-      padding: 13px;
-    }
-
-    .file-input-wrapper input {
-      border: none;
-      padding: 0;
-      background: transparent;
-    }
-
-    .add-modal-buttons {
-      display: flex;
-      justify-content: flex-end;
-      gap: 9px;
-      margin-top: 20px;
-    }
-
-    .btn-form {
-      border: 1px solid var(--border);
-      background: var(--bg-cream);
-      color: var(--text-main);
-      padding: 10px 17px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.82rem;
-    }
-
-    .btn-form.primary {
-      background: #9e5843;
-      border-color: #9e5843;
       color: white;
+      font-size: 15px;
+      font-weight: 600;
+
+      cursor: pointer;
+      transition: transform .2s ease;
     }
 
-    .btn-form.primary:hover {
-      background: #864734;
-    }
-
-    .btn-form:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .form-message {
-      font-size: 0.78rem;
-      margin-top: 10px;
-      color: #9e5843;
-      min-height: 18px;
+    .story-cluster-pin:hover {
+      transform: scale(1.12);
     }
 
     /* =========================
-       스토리 보기 모달
+       MODAL
     ========================= */
 
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(25, 20, 16, 0.65);
+      background: rgba(25,20,16,.65);
       backdrop-filter: blur(8px);
+
       display: flex;
       align-items: center;
       justify-content: center;
+
       z-index: 2000;
+
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.3s ease, visibility 0.3s ease;
+
+      transition:
+        opacity .3s ease,
+        visibility .3s ease;
+
       padding: 20px;
     }
 
@@ -356,19 +225,30 @@
 
     .modal-card {
       background: var(--bg-card);
+
       width: 100%;
       max-width: 1000px;
+
       height: 85vh;
       max-height: 740px;
+
       border-radius: 18px;
-      box-shadow: 0 24px 60px rgba(25, 18, 12, 0.28);
+
+      box-shadow: 0 24px 60px rgba(25,18,12,.28);
+
       border: 1px solid var(--border);
+
       display: flex;
       flex-direction: column;
+
       overflow: hidden;
+
       position: relative;
-      transform: translateY(20px) scale(0.98);
-      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+
+      transform: translateY(20px) scale(.98);
+
+      transition:
+        transform .35s cubic-bezier(.16,1,.3,1);
     }
 
     .modal-overlay.active .modal-card {
@@ -377,43 +257,56 @@
 
     .btn-close-modal {
       position: absolute;
+
       top: 14px;
       right: 16px;
+
       width: 36px;
       height: 36px;
-      background: rgba(253, 251, 247, 0.92);
+
+      background: rgba(253,251,247,.92);
+
       border: 1px solid var(--border);
       border-radius: 50%;
+
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.15rem;
-      color: var(--text-main);
-      cursor: pointer;
-      z-index: 30;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
 
-    .btn-close-modal:hover {
-      background: #f0eae1;
-      transform: rotate(90deg) scale(1.05);
+      font-size: 1.15rem;
+
+      color: var(--text-main);
+
+      cursor: pointer;
+
+      z-index: 30;
     }
 
     .modal-body {
       display: grid;
+
       grid-template-columns: 1.2fr 1fr;
+
       height: 100%;
+
       overflow: hidden;
     }
 
+    /* =========================
+       IMAGE
+    ========================= */
+
     .modal-media-slider {
       position: relative;
+
       background: #14110f;
+
       height: 100%;
+
       display: flex;
       align-items: center;
       justify-content: center;
+
       overflow: hidden;
       user-select: none;
     }
@@ -421,52 +314,79 @@
     .slide-bg-blur {
       position: absolute;
       inset: -20px;
+
       background-size: cover;
       background-position: center;
-      filter: blur(28px) brightness(0.45) saturate(1.2);
+
+      filter: blur(28px) brightness(.45) saturate(1.2);
+
       transform: scale(1.15);
+
       z-index: 1;
-      opacity: 0.85;
-      transition: background-image 0.3s ease;
+      opacity: .85;
     }
 
     .slide-img-wrapper {
       position: relative;
+
       z-index: 2;
+
       width: 100%;
       height: 100%;
+
       display: flex;
       align-items: center;
       justify-content: center;
+
       padding: 14px;
     }
 
     .slide-img {
       max-width: 100%;
       max-height: 100%;
+
       width: auto;
       height: auto;
+
       object-fit: contain;
+
       border-radius: 8px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+
+      box-shadow: 0 10px 30px rgba(0,0,0,.4);
+
       display: block;
     }
 
+    /* =========================
+       SLIDER
+    ========================= */
+
     .slider-nav-btn {
       position: absolute;
+
       top: 50%;
+
       transform: translateY(-50%);
+
       width: 40px;
       height: 40px;
-      background: rgba(253,251,247,0.88);
-      border: 1px solid rgba(255,255,255,0.4);
+
+      background: rgba(253,251,247,.88);
+
+      border: 1px solid rgba(255,255,255,.4);
+
       border-radius: 50%;
+
       display: flex;
       align-items: center;
       justify-content: center;
+
       font-size: 1.4rem;
+
       color: var(--text-main);
+
       cursor: pointer;
+
       z-index: 10;
     }
 
@@ -480,179 +400,516 @@
 
     .slider-bottom-bar {
       position: absolute;
+
       bottom: 14px;
       left: 14px;
       right: 14px;
+
       display: flex;
+
       justify-content: space-between;
       align-items: center;
+
       z-index: 10;
-      pointer-events: none;
     }
 
     .slider-caption {
-      background: rgba(20,16,12,0.78);
+      background: rgba(20,16,12,.78);
+
       color: #f7f3ed;
-      font-size: 0.75rem;
+
+      font-size: .75rem;
+
       padding: 6px 12px;
+
       border-radius: 6px;
+
       max-width: 68%;
+
       white-space: nowrap;
+
       overflow: hidden;
+
       text-overflow: ellipsis;
     }
 
     .slider-dots {
       display: flex;
       gap: 6px;
-      background: rgba(20,16,12,0.55);
+
+      background: rgba(20,16,12,.55);
+
       padding: 6px 10px;
+
       border-radius: 12px;
     }
 
     .dot {
       width: 7px;
       height: 7px;
-      background: rgba(255,255,255,0.45);
+
+      background: rgba(255,255,255,.45);
+
       border-radius: 50%;
+
       cursor: pointer;
     }
 
     .dot.active {
       background: white;
+
       width: 18px;
+
       border-radius: 4px;
     }
 
+    /* =========================
+       CONTENT
+    ========================= */
+
     .modal-content-area {
       padding: 30px 28px 20px;
+
       display: flex;
       flex-direction: column;
+
       height: 100%;
+
       overflow: hidden;
+
       background: var(--bg-card);
     }
 
     .modal-scroll-content {
       flex: 1;
+
       overflow-y: auto;
+
       padding-right: 6px;
+
       margin-bottom: 12px;
     }
 
     .modal-header-tag {
       display: inline-block;
-      font-size: 0.72rem;
+
+      font-size: .72rem;
       font-weight: 600;
+
       padding: 4px 10px;
+
       border-radius: 20px;
+
       margin-bottom: 10px;
     }
 
     .modal-author-name {
-      font-size: 0.85rem;
+      font-size: .85rem;
+
       font-weight: 500;
+
       color: var(--text-sub);
+
       margin-bottom: 3px;
     }
 
     .modal-work-title {
       font-size: 1.4rem;
+
       font-weight: 600;
+
       color: var(--text-main);
+
       line-height: 1.35;
+
       margin-bottom: 6px;
     }
 
     .modal-place-name {
-      font-size: 0.82rem;
+      font-size: .82rem;
+
       color: var(--text-sub);
+
       margin-bottom: 18px;
     }
 
     .quotes-wrapper {
       display: flex;
       flex-direction: column;
+
       gap: 14px;
+
       border-top: 1px dashed var(--border);
+
       border-bottom: 1px dashed var(--border);
+
       padding: 18px 0;
+
       margin-bottom: 14px;
     }
 
     .quote-item {
       font-family: 'Noto Serif KR', serif;
-      font-size: 0.88rem;
+
+      font-size: .88rem;
+
       line-height: 1.75;
+
       color: #443c34;
-      position: relative;
+
       padding-left: 14px;
+
       border-left: 2.5px solid;
-      word-break: keep-all;
+
+      white-space: pre-line;
     }
 
-    .quote-item.commentary {
-      font-family: 'Noto Sans KR', sans-serif;
-      font-size: 0.82rem;
-      line-height: 1.65;
+    .user-story-label {
+      display: inline-block;
+
+      font-size: .7rem;
+
+      padding: 4px 9px;
+
+      border-radius: 15px;
+
+      background: #eee7dc;
+
       color: #706458;
-      background: rgba(0,0,0,0.025);
-      padding: 10px 12px;
-      border-left-width: 3px;
-      margin-top: 4px;
-    }
 
-    .modal-fixed-footer {
-      flex-shrink: 0;
-      border-top: 1px solid var(--border);
-      padding-top: 12px;
-    }
-
-    .modal-music-bar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background-color: var(--bg-cream);
-      border: 1px solid var(--border);
-      padding: 8px 12px;
-      border-radius: 10px;
       margin-bottom: 8px;
     }
 
-    .music-info {
-      flex: 1;
-      font-size: 0.75rem;
-      color: var(--text-main);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    /* =========================
+       FOOTER
+    ========================= */
+
+    .modal-fixed-footer {
+      flex-shrink: 0;
+
+      border-top: 1px solid var(--border);
+
+      padding-top: 12px;
     }
 
     .modal-footer-note {
-      font-size: 0.73rem;
+      font-size: .73rem;
+
       color: #a3998f;
+
       text-align: right;
     }
 
+    /* =========================
+       ADD STORY
+    ========================= */
+
+    .add-story-modal {
+      position: fixed;
+
+      inset: 0;
+
+      background: rgba(25,20,16,.65);
+
+      backdrop-filter: blur(8px);
+
+      z-index: 3000;
+
+      display: none;
+
+      align-items: center;
+
+      justify-content: center;
+
+      padding: 20px;
+    }
+
+    .add-story-card {
+      width: 100%;
+      max-width: 520px;
+
+      max-height: 90vh;
+
+      overflow-y: auto;
+
+      background: var(--bg-card);
+
+      border-radius: 18px;
+
+      padding: 26px;
+
+      box-shadow: 0 24px 60px rgba(25,18,12,.3);
+
+      border: 1px solid var(--border);
+
+      position: relative;
+    }
+
+    .add-story-card h2 {
+      font-family: 'Playfair Display', serif;
+
+      font-size: 1.35rem;
+
+      margin-bottom: 5px;
+    }
+
+    .add-story-description {
+      color: var(--text-sub);
+
+      font-size: .78rem;
+
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+
+      font-size: .78rem;
+
+      font-weight: 500;
+
+      margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+
+      padding: 11px 12px;
+
+      border: 1px solid var(--border);
+
+      border-radius: 9px;
+
+      background: #fffdf9;
+
+      color: var(--text-main);
+
+      outline: none;
+
+      font-size: .82rem;
+    }
+
+    .form-group textarea {
+      min-height: 120px;
+
+      resize: vertical;
+
+      line-height: 1.6;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: #b59b83;
+
+      box-shadow: 0 0 0 3px rgba(181,155,131,.12);
+    }
+
+    .image-preview {
+      width: 100%;
+
+      max-height: 180px;
+
+      object-fit: contain;
+
+      border-radius: 10px;
+
+      margin-top: 8px;
+
+      display: none;
+
+      background: #eee8de;
+    }
+
+    .form-buttons {
+      display: flex;
+
+      gap: 8px;
+
+      margin-top: 20px;
+    }
+
+    .form-buttons button {
+      flex: 1;
+
+      padding: 11px;
+
+      border-radius: 9px;
+
+      border: 1px solid var(--border);
+
+      cursor: pointer;
+
+      font-size: .82rem;
+    }
+
+    .btn-cancel {
+      background: var(--bg-cream);
+      color: var(--text-main);
+    }
+
+    .btn-submit {
+      background: #806653;
+      color: white;
+      border-color: #806653 !important;
+    }
+
+    .btn-submit:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    /* =========================
+       STORY LIST
+    ========================= */
+
+    .story-list-modal {
+      position: fixed;
+
+      inset: 0;
+
+      background: rgba(25,20,16,.55);
+
+      backdrop-filter: blur(6px);
+
+      z-index: 2500;
+
+      display: none;
+
+      align-items: center;
+
+      justify-content: center;
+
+      padding: 20px;
+    }
+
+    .story-list-card {
+      width: 100%;
+
+      max-width: 500px;
+
+      max-height: 80vh;
+
+      overflow-y: auto;
+
+      background: var(--bg-card);
+
+      border: 1px solid var(--border);
+
+      border-radius: 18px;
+
+      padding: 24px;
+
+      box-shadow: 0 20px 50px rgba(25,18,12,.25);
+    }
+
+    .story-list-title {
+      font-size: 1.15rem;
+
+      font-weight: 600;
+
+      margin-bottom: 6px;
+    }
+
+    .story-list-place {
+      color: var(--text-sub);
+
+      font-size: .8rem;
+
+      margin-bottom: 18px;
+    }
+
+    .story-list-item {
+      width: 100%;
+
+      text-align: left;
+
+      background: var(--bg-cream);
+
+      border: 1px solid var(--border);
+
+      border-radius: 12px;
+
+      padding: 14px;
+
+      margin-bottom: 10px;
+
+      cursor: pointer;
+    }
+
+    .story-list-item:hover {
+      background: #eee7dc;
+
+      border-color: #c4b5a2;
+    }
+
+    .story-list-item-title {
+      font-weight: 600;
+
+      color: var(--text-main);
+
+      margin-bottom: 4px;
+    }
+
+    .story-list-item-author {
+      font-size: .75rem;
+
+      color: var(--text-sub);
+    }
+
+    .story-list-close {
+      width: 100%;
+
+      margin-top: 8px;
+
+      padding: 10px;
+
+      border: 1px solid var(--border);
+
+      background: white;
+
+      border-radius: 9px;
+
+      cursor: pointer;
+
+      color: var(--text-main);
+    }
+
+    /* =========================
+       DELETE
+    ========================= */
+
     .delete-story-btn {
       margin-top: 15px;
+
       width: 100%;
+
       padding: 9px;
-      border: 1px solid #d7b5ac;
-      color: #9e5843;
-      background: #fff8f5;
+
       border-radius: 8px;
+
+      border: 1px solid #dfc4c0;
+
+      background: #fbefed;
+
+      color: #9a4d43;
+
       cursor: pointer;
-      font-size: 0.78rem;
+
+      font-size: .75rem;
     }
 
-    .delete-story-btn:hover {
-      background: #f8e9e4;
-    }
+    /* =========================
+       MOBILE
+    ========================= */
 
     @media (max-width: 860px) {
-      .modal-overlay,
-      .add-modal-overlay {
+
+      .modal-overlay {
         padding: 10px;
       }
 
@@ -674,29 +931,14 @@
       .modal-content-area {
         padding: 18px 16px 14px;
       }
+    }
 
-      .modal-work-title {
-        font-size: 1.25rem;
-      }
+    @media (max-width: 480px) {
 
       header {
         padding: 12px 16px;
       }
 
-      .header-controls {
-        gap: 5px;
-      }
-
-      .btn-header {
-        padding: 7px 9px;
-      }
-
-      .btn-add-story {
-        font-size: 0.75rem;
-      }
-    }
-
-    @media (max-width: 480px) {
       .title-group h1 {
         font-size: 1.1rem;
       }
@@ -705,250 +947,196 @@
         display: none;
       }
 
+      .header-controls {
+        gap: 5px;
+      }
+
+      .btn-header {
+        padding: 7px 9px;
+        font-size: .7rem;
+      }
+
       .modal-media-slider {
         height: 260px;
       }
 
-      .add-modal {
-        padding: 22px 18px;
-      }
-
-      .coordinate-row {
-        grid-template-columns: 1fr;
-      }
     }
+
   </style>
 </head>
 
 <body>
 
-<header>
-  <div class="title-group">
-    <h1>Where story lives</h1>
-    <p>문학과 영화 속 장소로 떠나보세요 · 핀을 누르면 음악과 이야기가 펼쳐집니다</p>
+  <!-- =========================
+       HEADER
+  ========================= -->
+
+  <header>
+
+    <div class="title-group">
+
+      <h1>Where story lives</h1>
+
+      <p>
+        문학과 영화 속 장소로 떠나보세요 · 핀을 누르면 음악과 이야기가 펼쳐집니다
+      </p>
+
+    </div>
+
+    <div class="header-controls">
+
+      <button
+        id="btnToggleBgm"
+        class="btn-header"
+        onclick="toggleMainBgm()"
+      >
+        <span id="bgmIcon">🎵</span>
+        <span id="bgmText">배경음악 ON</span>
+      </button>
+
+      <button
+        class="btn-header"
+        onclick="openAddStoryModal()"
+      >
+        ＋ Add your story
+      </button>
+
+      <button
+        class="btn-header"
+        onclick="resetView()"
+      >
+        초기 위치로
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- =========================
+       MAP
+  ========================= -->
+
+  <div id="map-container">
+    <div id="map"></div>
   </div>
 
-  <div class="header-controls">
-    <button class="btn-header btn-add-story" onclick="openAddStoryModal()">
-      ＋ Add Your Story
-    </button>
 
-    <button id="btnToggleBgm" class="btn-header" onclick="toggleMainBgm()">
-      <span id="bgmIcon">🎵</span>
-      <span id="bgmText">배경음악 ON</span>
-    </button>
+  <!-- =========================
+       DETAIL MODAL
+  ========================= -->
 
-    <button class="btn-header" onclick="resetView()">
-      초기 위치로
-    </button>
-  </div>
-</header>
+  <div
+    id="storyModal"
+    class="modal-overlay"
+    onclick="handleOverlayClick(event)"
+  >
 
-<div id="map-container">
-  <div id="map"></div>
-</div>
+    <div class="modal-card">
 
+      <button
+        class="btn-close-modal"
+        onclick="closeModal()"
+      >
+        ✕
+      </button>
 
-<!-- =========================
-     Add Your Story 모달
-========================= -->
+      <div class="modal-body">
 
-<div id="addStoryModal" class="add-modal-overlay" onclick="handleAddOverlayClick(event)">
-  <div class="add-modal">
+        <!-- IMAGE -->
 
-    <button class="btn-close-modal" onclick="closeAddStoryModal()">✕</button>
-
-    <h2>Add Your Story</h2>
-
-    <p class="add-modal-description">
-      당신의 이야기가 머물렀던 장소를 지도에 남겨보세요.
-    </p>
-
-    <form id="storyForm" onsubmit="submitStory(event)">
-
-      <div class="form-group">
-        <label for="nickname">누구의 이야기인가요?</label>
-        <input
-          type="text"
-          id="nickname"
-          placeholder="닉네임을 입력해주세요"
-          required
-          maxlength="50"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="cityName">어디의 이야기인가요?</label>
-        <input
-          type="text"
-          id="cityName"
-          placeholder="예: 대한민국 서울"
-          required
-          maxlength="100"
-        />
-      </div>
-
-      <div class="form-group">
-        <label>장소의 위치</label>
-
-        <div class="coordinate-row">
-          <input
-            type="number"
-            id="latitude"
-            placeholder="위도 (예: 37.5665)"
-            step="any"
-            required
-          />
-
-          <input
-            type="number"
-            id="longitude"
-            placeholder="경도 (예: 126.9780)"
-            step="any"
-            required
-          />
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="storyImage">사진</label>
-
-        <div class="file-input-wrapper">
-          <input
-            type="file"
-            id="storyImage"
-            accept="image/*"
-            required
-          />
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="quote">당신의 문장 / 명대사</label>
-
-        <textarea
-          id="quote"
-          placeholder="이 장소에 남기고 싶은 이야기나 문장을 적어주세요."
-          required
-          maxlength="2000"
-        ></textarea>
-      </div>
-
-      <div id="formMessage" class="form-message"></div>
-
-      <div class="add-modal-buttons">
-        <button
-          type="button"
-          class="btn-form"
-          onclick="closeAddStoryModal()"
-        >
-          취소
-        </button>
-
-        <button
-          type="submit"
-          id="submitStoryBtn"
-          class="btn-form primary"
-        >
-          이야기 남기기
-        </button>
-      </div>
-
-    </form>
-  </div>
-</div>
-
-
-<!-- =========================
-     Story 보기 모달
-========================= -->
-
-<div id="storyModal" class="modal-overlay" onclick="handleOverlayClick(event)">
-
-  <div class="modal-card">
-
-    <button class="btn-close-modal" onclick="closeModal()">✕</button>
-
-    <div class="modal-body">
-
-      <div class="modal-media-slider">
-
-        <div id="slideBgBlur" class="slide-bg-blur"></div>
-
-        <div class="slide-img-wrapper">
-          <img id="slideImg" class="slide-img" src="" alt="장소 사진" />
-        </div>
-
-        <button
-          id="btnPrevSlide"
-          class="slider-nav-btn prev"
-          onclick="prevSlide()"
-        >
-          ‹
-        </button>
-
-        <button
-          id="btnNextSlide"
-          class="slider-nav-btn next"
-          onclick="nextSlide()"
-        >
-          ›
-        </button>
-
-        <div class="slider-bottom-bar">
-
-          <div id="slideCaption" class="slider-caption"></div>
-
-          <div id="sliderDots" class="slider-dots"></div>
-
-        </div>
-      </div>
-
-
-      <div class="modal-content-area">
-
-        <div class="modal-scroll-content">
-
-          <span id="modalTag" class="modal-header-tag"></span>
-
-          <div id="modalAuthor" class="modal-author-name"></div>
-
-          <h2 id="modalTitle" class="modal-work-title"></h2>
-
-          <div id="modalPlace" class="modal-place-name"></div>
-
-          <div id="modalQuotes" class="quotes-wrapper"></div>
-
-          <button
-            id="deleteStoryBtn"
-            class="delete-story-btn"
-            style="display:none;"
-            onclick="deleteCurrentUserStory()"
-          >
-            🗑 이 이야기 삭제하기
-          </button>
-
-        </div>
-
-        <div class="modal-fixed-footer">
+        <div class="modal-media-slider">
 
           <div
-            id="musicBarContainer"
-            class="modal-music-bar"
-            style="display:none;"
-          >
-            <span>🎶</span>
+            id="slideBgBlur"
+            class="slide-bg-blur"
+          ></div>
 
-            <span
-              id="modalMusicTitle"
-              class="music-info"
-            >
-              재생 중인 테마곡
-            </span>
+          <div class="slide-img-wrapper">
+
+            <img
+              id="slideImg"
+              class="slide-img"
+              src=""
+              alt="장소 사진"
+            />
+
           </div>
 
-          <div class="modal-footer-note">
-            Where story lives Collection
+          <button
+            id="btnPrevSlide"
+            class="slider-nav-btn prev"
+            onclick="prevSlide()"
+          >
+            ‹
+          </button>
+
+          <button
+            id="btnNextSlide"
+            class="slider-nav-btn next"
+            onclick="nextSlide()"
+          >
+            ›
+          </button>
+
+          <div class="slider-bottom-bar">
+
+            <div
+              id="slideCaption"
+              class="slider-caption"
+            ></div>
+
+            <div
+              id="sliderDots"
+              class="slider-dots"
+            ></div>
+
+          </div>
+
+        </div>
+
+
+        <!-- TEXT -->
+
+        <div class="modal-content-area">
+
+          <div class="modal-scroll-content">
+
+            <span
+              id="modalTag"
+              class="modal-header-tag"
+            ></span>
+
+            <div
+              id="modalAuthor"
+              class="modal-author-name"
+            ></div>
+
+            <h2
+              id="modalTitle"
+              class="modal-work-title"
+            ></h2>
+
+            <div
+              id="modalPlace"
+              class="modal-place-name"
+            ></div>
+
+            <div
+              id="modalQuotes"
+              class="quotes-wrapper"
+            ></div>
+
+            <div id="modalUserInfo"></div>
+
+          </div>
+
+          <div class="modal-fixed-footer">
+
+            <div class="modal-footer-note">
+              Where story lives Collection
+            </div>
+
           </div>
 
         </div>
@@ -956,1817 +1144,2057 @@
       </div>
 
     </div>
+
   </div>
-</div>
 
 
-<script
-  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-  crossorigin=""
-></script>
+  <!-- =========================
+       STORY LIST
+  ========================= -->
 
+  <div
+    id="storyListModal"
+    class="story-list-modal"
+  >
 
-<script>
-/* =========================================================
-   SUPABASE 설정
-========================================================= */
+    <div class="story-list-card">
 
-const SUPABASE_URL =
-  "https://demdvfucrqnctjeoohnz.supabase.co";
+      <div
+        class="story-list-title"
+        id="storyListTitle"
+      >
+        이 장소의 이야기
+      </div>
 
-const SUPABASE_KEY =
-  "sb_publishable_VC6VtH5aTVBoN3G_m7lL0g_tgRjHcwI";
+      <div
+        class="story-list-place"
+        id="storyListPlace"
+      ></div>
 
-const CITY_TABLE =
-  `${SUPABASE_URL}/rest/v1/city_images`;
+      <div
+        id="storyListItems"
+      ></div>
 
-const STORAGE_BUCKET =
-  "city-images";
+      <button
+        class="story-list-close"
+        onclick="closeStoryList()"
+      >
+        닫기
+      </button>
 
+    </div>
 
-/* =========================================================
-   기본 음악
-========================================================= */
+  </div>
 
-const mainBgm = new Audio("main.mp3");
 
-mainBgm.loop = true;
-mainBgm.volume = 0.35;
+  <!-- =========================
+       ADD STORY MODAL
+  ========================= -->
 
-let isMainBgmPlaying = false;
+  <div
+    id="addStoryModal"
+    class="add-story-modal"
+  >
 
-const placeAudio = new Audio();
+    <div class="add-story-card">
 
-placeAudio.loop = true;
-placeAudio.volume = 0.5;
+      <button
+        class="btn-close-modal"
+        onclick="closeAddStoryModal()"
+      >
+        ✕
+      </button>
 
+      <h2>Add your story</h2>
 
-function autoStartBgmOnce() {
+      <p class="add-story-description">
+        당신의 이야기가 머물렀던 장소를 지도에 남겨보세요.
+      </p>
 
-  if (!isMainBgmPlaying) {
 
-    mainBgm.play()
-      .then(() => {
+      <!-- 닉네임 -->
 
-        isMainBgmPlaying = true;
+      <div class="form-group">
 
-        updateBgmButtonUI();
+        <label>
+          누구의 이야기인가요?
+        </label>
 
-      })
-      .catch(() => {});
+        <input
+          id="storyNickname"
+          type="text"
+          placeholder="닉네임을 입력해주세요"
+        >
 
-  }
+      </div>
 
-  document.removeEventListener(
-    "click",
-    autoStartBgmOnce
-  );
-}
 
+      <!-- 장소 -->
 
-document.addEventListener(
-  "click",
-  autoStartBgmOnce,
-  { once: true }
-);
+      <div class="form-group">
 
+        <label>
+          장소 이름
+        </label>
 
-function toggleMainBgm() {
+        <input
+          id="storyCity"
+          type="text"
+          placeholder="예: 서울 남산"
+        >
 
-  if (isMainBgmPlaying) {
+      </div>
 
-    mainBgm.pause();
 
-    isMainBgmPlaying = false;
+      <!-- 위도 -->
 
-  } else {
+      <div class="form-group">
 
-    mainBgm.play()
-      .then(() => {
+        <label>
+          위도 (Latitude)
+        </label>
 
-        isMainBgmPlaying = true;
+        <input
+          id="storyLat"
+          type="number"
+          step="any"
+          placeholder="예: 37.5512"
+        >
 
-        updateBgmButtonUI();
+      </div>
 
-      })
-      .catch(() => {});
 
-  }
+      <!-- 경도 -->
 
-  updateBgmButtonUI();
-}
+      <div class="form-group">
 
+        <label>
+          경도 (Longitude)
+        </label>
 
-function updateBgmButtonUI() {
+        <input
+          id="storyLng"
+          type="number"
+          step="any"
+          placeholder="예: 126.9882"
+        >
 
-  const btn =
-    document.getElementById("btnToggleBgm");
+      </div>
 
-  const icon =
-    document.getElementById("bgmIcon");
 
-  const text =
-    document.getElementById("bgmText");
+      <!-- 사진 -->
 
-  if (isMainBgmPlaying) {
+      <div class="form-group">
 
-    btn.classList.add("active");
+        <label>
+          사진
+        </label>
 
-    icon.textContent = "🎵";
+        <input
+          id="storyImage"
+          type="file"
+          accept="image/*"
+          onchange="previewStoryImage(event)"
+        >
 
-    text.textContent = "배경음악 ON";
+        <img
+          id="imagePreview"
+          class="image-preview"
+          alt="사진 미리보기"
+        >
 
-  } else {
+      </div>
 
-    btn.classList.remove("active");
 
-    icon.textContent = "🔇";
+      <!-- 명대사 -->
 
-    text.textContent = "배경음악 OFF";
-  }
-}
+      <div class="form-group">
 
+        <label>
+          이 장소에 남기고 싶은 이야기 / 명대사
+        </label>
 
-/* =========================================================
-   지도
-========================================================= */
+        <textarea
+          id="storyQuote"
+          placeholder="이 장소와 관련된 문장이나 이야기를 적어주세요."
+        ></textarea>
 
-const initialCenter = [30.0, 35.0];
+      </div>
 
-const initialZoom = 2.7;
 
+      <div class="form-buttons">
 
-const map = L.map("map", {
+        <button
+          class="btn-cancel"
+          onclick="closeAddStoryModal()"
+        >
+          취소
+        </button>
 
-  center: initialCenter,
+        <button
+          id="submitStoryButton"
+          class="btn-submit"
+          onclick="submitStory()"
+        >
+          이야기 추가하기
+        </button>
 
-  zoom: initialZoom,
+      </div>
 
-  minZoom: 2,
+    </div>
 
-  maxZoom: 16,
+  </div>
 
-  zoomControl: true,
 
-  attributionControl: true
+  <!-- Leaflet -->
 
-});
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
 
 
-L.tileLayer(
-  "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-  {
-    attribution:
-      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  <script>
 
-    subdomains: "abcd",
+    // ============================================================
+    // SUPABASE 설정
+    // ============================================================
 
-    maxZoom: 19,
+    const SUPABASE_URL =
+      "https://demdvfucrqnctjeoohnz.supabase.co";
 
-    className: "warm-ivory-tile"
-  }
-).addTo(map);
+    const SUPABASE_KEY =
+      "sb_publishable_VC6VtH5aTVBoN3G_m7lL0g_tgRjHcwI";
 
+    const TABLE_URL =
+      `${SUPABASE_URL}/rest/v1/city_images`;
 
-/* =========================================================
-   기존 8개 장소
-========================================================= */
+    const STORAGE_URL =
+      `${SUPABASE_URL}/storage/v1/object/public/city-images`;
 
-const storyPlaces = [
 
-  {
-    id: "snow-country",
-    name: "일본 니가타현 에치고 유자와 온천마을",
-    type: "book",
-    author: "가와바타 야스나리 소설",
-    title: "《설국》",
-    latlng: [36.9358, 138.8106],
-    pinColor: "#4e6a82",
-    tagBg: "#e2ecf4",
-    tagColor: "#324d63",
-    audioSrc: "snow.mp3",
-    audioTitle: "설국 테마 (snow.mp3)",
-    startTime: 0,
+    // ============================================================
+    // SUPABASE 요청 공통 함수
+    // ============================================================
 
-    photos: [
-      {
-        url: "snow1.jpg",
-        caption: "1. 눈 내리는 간이역과 전신주 가로등"
-      },
-      {
-        url: "snow2.jpg",
-        caption: "2. 다다미 방 창 너머 펼쳐진 설경"
-      },
-      {
-        url: "snow3.jpg",
-        caption: "3. 누각의 등불과 눈 덮인 겨울 숲"
-      },
-      {
-        url: "snow4.jpg",
-        caption: "4. 눈 내린 밤의 돌계단과 등롱"
+    async function supabaseRequest(url, options = {}) {
+
+      const response = await fetch(url, {
+
+        ...options,
+
+        headers: {
+
+          "apikey": SUPABASE_KEY,
+
+          "Authorization": `Bearer ${SUPABASE_KEY}`,
+
+          ...(options.headers || {})
+
+        }
+
+      });
+
+      if (!response.ok) {
+
+        const errorText =
+          await response.text();
+
+        throw new Error(errorText);
+
       }
-    ],
 
-    quotes: [
-      "국경의 긴 터널을 빠져나오자, 눈의 고장이었다. 밤의 밑바닥이 하얘졌다.",
-      "온 마음을 바친 사랑의 흔적은 그 어느 때고 미지의 장소에서 사람을 감동시키고야 마는 것일까?",
-      "\"당신은 절 좋은 여자라고 하셨죠? 떠날 사람이 왜 그런 말을 하신 거예요? 울었어요. 집에 돌아가서도 울었어요. 헤어지는 게 무서워요. 하지만 어서 가버려요. 그 말 듣고 울었던 걸 잊진 않을 테니까.\""
-    ]
-  },
+      const text =
+        await response.text();
+
+      if (!text) return null;
+
+      return JSON.parse(text);
+
+    }
 
 
-  {
-    id: "no-longer-human",
-    name: "일본 아오모리현",
-    type: "book",
-    author: "다자이 오사무 소설",
-    title: "《인간 실격》",
-    latlng: [40.8244, 140.7400],
-    pinColor: "#c26d7b",
-    tagBg: "#faeaed",
-    tagColor: "#8f3f4c",
-    audioSrc: "blossom.mp3",
-    audioTitle: "One more time, One more chance (blossom.mp3)",
-    startTime: 0,
+    // ============================================================
+    // 기존 8개 장소
+    // ============================================================
 
-    photos: [
+    const storyPlaces = [
+
       {
-        url: "blossom4.jpg",
-        caption: "1. 붉은 다리와 물가에 비친 만개한 벚꽃"
+        id: "snow-country",
+        name: "일본 니가타현 에치고 유자와 온천마을",
+        type: "book",
+        author: "가와바타 야스나리 소설",
+        title: "《설국》",
+        latlng: [36.9358, 138.8106],
+        pinColor: "#4e6a82",
+        tagBg: "#e2ecf4",
+        tagColor: "#324d63",
+
+        photos: [
+          {
+            url: "snow1.jpg",
+            caption: "1. 눈 내리는 간이역과 전신주 가로등"
+          },
+          {
+            url: "snow2.jpg",
+            caption: "2. 다다미 방 창 너머 펼쳐진 설경"
+          },
+          {
+            url: "snow3.jpg",
+            caption: "3. 누각의 등불과 눈 덮인 겨울 숲"
+          },
+          {
+            url: "snow4.jpg",
+            caption: "4. 눈 내린 밤의 돌계단과 등롱"
+          }
+        ],
+
+        quotes: [
+          "국경의 긴 터널을 빠져나오자, 눈의 고장이었다. 밤의 밑바닥이 하얘졌다.",
+          "온 마음을 바친 사랑의 흔적은 그 어느 때고 미지의 장소에서 사람을 감동시키고야 마는 것일까?",
+          "\"당신은 절 좋은 여자라고 하셨죠? 떠날 사람이 왜 그런 말을 하신 거예요? 울었어요. 집에 돌아가서도 울었어요. 헤어지는 게 무서워요.\""
+        ]
       },
+
+
       {
-        url: "blossom1.jpg",
-        caption: "2. 밤하늘 아래 물가에 드리운 벚꽃과 은은한 불빛"
+        id: "no-longer-human",
+        name: "일본 아오모리현",
+        type: "book",
+        author: "다자이 오사무 소설",
+        title: "《인간 실격》",
+        latlng: [40.8244, 140.7400],
+        pinColor: "#c26d7b",
+        tagBg: "#faeaed",
+        tagColor: "#8f3f4c",
+
+        photos: [
+          {
+            url: "blossom4.jpg",
+            caption: "1. 붉은 다리와 물가에 비친 만개한 벚꽃"
+          },
+          {
+            url: "blossom1.jpg",
+            caption: "2. 밤하늘 아래 물가에 드리운 벚꽃"
+          },
+          {
+            url: "blossom2.jpg",
+            caption: "3. 벚꽃 터널 속을 달리는 완행열차"
+          },
+          {
+            url: "blossom3.jpg",
+            caption: "4. 설산을 배경으로 서 있는 벚나무"
+          }
+        ],
+
+        quotes: [
+          "바닷가. 파도가 밀려와 부서지는 곳이라 해도 좋을 만큼 바다와 가까운 해안가. 시커먼 줄기에 우람한 덩치의 산벚나무가 스무그루 넘게 줄지어 서서, 새 학년이 시작될 때면 갈색의 끈끈한 어린잎과 함께 파란 바다를 배경으로 눈부신 꽃을 피우는 곳."
+        ]
       },
+
+
       {
-        url: "blossom2.jpg",
-        caption: "3. 벚꽃 터널 속을 달리는 완행열차"
+        id: "cmbyn",
+        name: "이탈리아 북부 롬바르디아 지방",
+        type: "movie",
+        author: "루카 구아다니노 감독",
+        title: "《콜 미 바이 유어 네임》",
+        latlng: [45.4791, 9.8452],
+        pinColor: "#c26b38",
+        tagBg: "#faebe3",
+        tagColor: "#8c441b",
+
+        photos: [
+          {
+            url: "peach1.jpg",
+            caption: "1. 햇살 아래 싱그러운 과수원의 복숭아"
+          },
+          {
+            url: "peach2.jpg",
+            caption: "2. 풀밭에 누워 여름 햇살을 만끽하던 순간"
+          },
+          {
+            url: "peach3.jpg",
+            caption: "3. 크레마 마을 광장에서의 잔잔한 대화"
+          },
+          {
+            url: "peach4.jpg",
+            caption: "4. 찬란하고 나른한 오후의 수영장"
+          }
+        ],
+
+        quotes: [
+          "\"Is it better to speak or die?\"\n(말하는 것이 나은가, 죽는 게 나은가?)",
+          "\"Call me by your name and I'll call you by mine.\"\n(네 이름으로 날 불러줘, 내 이름으로 널 부를게.)"
+        ]
       },
+
+
       {
-        url: "blossom3.jpg",
-        caption: "4. 설산을 배경으로 햇살 아래 서 있는 벚나무"
+        id: "sherlock",
+        name: "영국 런던 베이커 스트리트 221B",
+        type: "drama",
+        author: "BBC 드라마 시리즈",
+        title: "《셜록 (Sherlock)》",
+        latlng: [51.5237, -0.1585],
+        pinColor: "#6a2e35",
+        tagBg: "#f5e6e8",
+        tagColor: "#521d23",
+
+        photos: [
+          {
+            url: "sherlock1.jpg",
+            caption: "1. 221B 베이커 가 문 앞의 셜록 홈즈"
+          },
+          {
+            url: "sherlock2.jpg",
+            caption: "2. Speedy's 카페 앞"
+          },
+          {
+            url: "sherlock3.jpg",
+            caption: "3. 빅벤과 런던의 하늘"
+          },
+          {
+            url: "sherlock4.jpg",
+            caption: "4. 비 내리는 웨스트민스터"
+          },
+          {
+            url: "sherlock5.jpg",
+            caption: "5. I AM SHERLOCKED"
+          }
+        ],
+
+        quotes: [
+          "\"I'm not a psychopath, Anderson. I'm a high-functioning sociopath.\"\n(난 사이코패스가 아니야. 고지능 소시오패스지.)",
+          "\"Sentiment is a chemical defect found in the losing side.\"\n(감정은 패자에게서 발견되는 화학적 결함이지.)"
+        ]
+      },
+
+
+      {
+        id: "in-the-mood-for-love",
+        name: "홍콩 센트럴 구시가지 골목길",
+        type: "movie",
+        author: "왕가위 감독",
+        title: "《화양연화 (花樣年華)》",
+        latlng: [22.2830, 114.1536],
+        pinColor: "#9b2226",
+        tagBg: "#fae8e8",
+        tagColor: "#781418",
+
+        photos: [
+          {
+            url: "love1.jpg",
+            caption: "1. 거울에 비친 두 사람"
+          },
+          {
+            url: "love2.jpg",
+            caption: "2. 밤 골목 가로등 아래"
+          },
+          {
+            url: "love3.jpg",
+            caption: "3. 어둠 속에서 맞잡은 두 손"
+          },
+          {
+            url: "love4.jpg",
+            caption: "4. 택시 안에서 서로의 온기에 기대던 밤"
+          }
+        ],
+
+        quotes: [
+          "\"화양연화(花樣年華), 인생에서 가장 아름답고 행복한 순간.\"",
+          "\"그 시절은 지나갔고, 이제 거기 남은 것은 아무것도 없다.\"",
+          "\"배표 한 장 더 있으면, 나와 같이 갈래요?\""
+        ]
+      },
+
+
+      {
+        id: "decision-to-leave",
+        name: "대한민국 순천 송광사",
+        type: "movie",
+        author: "박찬욱 감독",
+        title: "《헤어질 결심 (Decision to Leave)》",
+        latlng: [34.9961, 127.2736],
+        pinColor: "#205560",
+        tagBg: "#e3eff1",
+        tagColor: "#163f47",
+
+        photos: [
+          {
+            url: "leave1.jpg",
+            caption: "1. 비 내리는 송광사"
+          },
+          {
+            url: "leave2.jpg",
+            caption: "2. 송광사 종루"
+          },
+          {
+            url: "leave3.jpg",
+            caption: "3. 일몰의 삼척 부남해변"
+          },
+          {
+            url: "leave4.jpg",
+            caption: "4. 밀려오는 만조의 바다"
+          }
+        ],
+
+        quotes: [
+          "\"내가 그렇게 만만합니까?\"",
+          "\"날 사랑한다고 말하는 순간 당신의 사랑이 끝났고, 당신의 사랑이 끝나는 순간 내 사랑이 시작됐죠.\"",
+          "\"바다에 버려요. 깊은 데 빠뜨려서, 아무도 못 찾게 해요.\""
+        ]
+      },
+
+
+      {
+        id: "summer",
+        name: "미국 뉴잉글랜드 버크셔 지방",
+        type: "book",
+        author: "이디스 워튼 소설",
+        title: "《여름 (Summer)》",
+        latlng: [42.3458, -73.2384],
+        pinColor: "#6c804b",
+        tagBg: "#edf3e5",
+        tagColor: "#47592f",
+
+        photos: [
+          {
+            url: "summer1.jpg",
+            caption: "1. 햇살에 반짝이는 호숫가"
+          },
+          {
+            url: "summer2.jpg",
+            caption: "2. 여름 햇살이 쏟아지는 들판"
+          },
+          {
+            url: "summer3.jpg",
+            caption: "3. 맑은 호수와 푸른 숲"
+          },
+          {
+            url: "summer4.jpg",
+            caption: "4. 나무 그늘 아래 책을 읽던 오후"
+          }
+        ],
+
+        quotes: [
+          "채리티는 아직 모르는 게 많은 데다 감각이 무뎠는데, 빛이며 공기, 향기, 색깔 같은 것들에 대해서는 몸속에 흐르는 피 한 방울 한 방울이 민감하게 반응했다.",
+          "잠시 그것에 대해 생각하지 않을 때면 채리티는 풀밭에 누워 너무 오랫동안 하늘을 올려다보곤 했다."
+        ]
+      },
+
+
+      {
+        id: "lalaland",
+        name: "미국 로스앤젤레스",
+        type: "movie",
+        author: "데이미언 셔젤 감독",
+        title: "《라라랜드 (La La Land)》",
+        latlng: [34.0522, -118.2437],
+        pinColor: "#69487d",
+        tagBg: "#f1eaf7",
+        tagColor: "#4c2e5e",
+
+        photos: [
+          {
+            url: "lalaland1.jpg",
+            caption: "1. 보랏빛 매직아워의 언덕"
+          },
+          {
+            url: "lalaland2.jpg",
+            caption: "2. 콜로라도 스트리트 브릿지"
+          },
+          {
+            url: "lalaland3.jpg",
+            caption: "3. 황금빛 석양의 해변"
+          },
+          {
+            url: "lalaland4.jpg",
+            caption: "4. 할리우드 언덕"
+          }
+        ],
+
+        quotes: [
+          "\"Here's to the ones who dream, foolish as they may seem.\"\n(꿈꾸는 이들을 위하여, 비록 바보처럼 보일지라도.)",
+          "\"I'm always gonna love you.\"\n(언제나 널 사랑할 거야.)"
+        ]
       }
-    ],
 
-    quotes: [
-      "바닷가. 파도가 밀려와 부서지는 곳이라 해도 좋을 만큼 바다와 가까운 해안가. 시커먼 줄기에 우람한 덩치의 산벚나무가 스무그루 넘게 줄지어 서서, 새 학년이 시작될 때면 갈색의 끈끈한 어린잎과 함께 파란 바다를 배경으로 눈부신 꽃을 피우고, 꽃잎이 눈처럼 흩날리는 시기가 찾아오면 수없이 많은 꽃잎이 바다에 떨어져 물 위를 수놓으며 떠돌다 파도를 타고 다시 물가로 되돌아오는 곳. 그 벚나무 모래톱을 고스란히 교정으로 사용하는 도호쿠 지방의 한 중학교에 저는 제대로 시험공부도 하지 않은 채 입학했습니다. 그 중학교의 모자 휘장과 교복 단추에도 도안화한 벚꽃이 피어있었습니다."
-    ]
-  },
+    ];
 
 
-  {
-    id: "cmbyn",
-    name: "이탈리아 북부 롬바르디아 지방",
-    type: "movie",
-    author: "루카 구아다니노 감독",
-    title: "《콜 미 바이 유어 네임》",
-    latlng: [45.4791, 9.8452],
-    pinColor: "#c26b38",
-    tagBg: "#faebe3",
-    tagColor: "#8c441b",
-    audioSrc: "peach.mp3",
-    audioTitle: "Mystery of Love (peach.mp3)",
-    startTime: 0,
+    // ============================================================
+    // MAP
+    // ============================================================
 
-    photos: [
+    const initialCenter = [30.0, 35.0];
+
+    const initialZoom = 2.7;
+
+    const map = L.map("map", {
+
+      center: initialCenter,
+
+      zoom: initialZoom,
+
+      minZoom: 2,
+
+      maxZoom: 16
+
+    });
+
+
+    L.tileLayer(
+      "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
       {
-        url: "peach1.jpg",
-        caption: "1. 햇살 아래 싱그러운 과수원의 복숭아"
-      },
-      {
-        url: "peach2.jpg",
-        caption: "2. 풀밭에 누워 여름 햇살을 만끽하던 순간"
-      },
-      {
-        url: "peach3.jpg",
-        caption: "3. 크레마 마을 광장에서의 잔잔한 대화"
-      },
-      {
-        url: "peach4.jpg",
-        caption: "4. 찬란하고 나른한 오후의 수영장 썬베드"
-      }
-    ],
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
 
-    quotes: [
-      "\"Is it better to speak or die?\"\n(말하는 것이 나은가, 죽는 게 나은가?)",
-      "\"Cause I wanted you to know… Cause I wanted you to know…\"\n(당신이 알아줬으면 해서… 알아줬으면 해서…)",
-      "\"Call me by your name and I’ll call you by mine.\"\n(네 이름으로 날 불러줘, 내 이름으로 널 부를게.)",
-      "\"Elio. Elio, Elio, Elio, Elio, Elio…\"\n(엘리오. 엘리오, 엘리오, 엘리오, 엘리오, 엘리오…)\n\n\"Oliver. I remember everything.\"\n(올리버. 나도 모든 걸 기억해.)"
-    ]
-  },
+        subdomains: "abcd",
 
+        maxZoom: 19,
 
-  {
-    id: "sherlock",
-    name: "영국 런던 베이커 스트리트 221B",
-    type: "drama",
-    author: "BBC 드라마 시리즈",
-    title: "《셜록 (Sherlock)》",
-    latlng: [51.5237, -0.1585],
-    pinColor: "#6a2e35",
-    tagBg: "#f5e6e8",
-    tagColor: "#521d23",
-    audioSrc: "sherlock.mp3",
-    audioTitle: "셜록 테마 (sherlock.mp3)",
-    startTime: 0,
-
-    photos: [
-      {
-        url: "sherlock1.jpg",
-        caption: "1. 221B 베이커 가 문 앞의 셜록 홈즈"
-      },
-      {
-        url: "sherlock2.jpg",
-        caption: "2. Speedy's 카페 앞 블랙캡과 셜록 & 존 왓슨"
-      },
-      {
-        url: "sherlock3.jpg",
-        caption: "3. 빅벤과 런던의 하늘을 등진 모리아티"
-      },
-      {
-        url: "sherlock4.jpg",
-        caption: "4. 비 내리는 웨스트민스터 다리와 빨간 공중전화부스"
-      },
-      {
-        url: "sherlock5.jpg",
-        caption: "5. 아이린의 스마트폰 잠금화면 'I AM SHERLOCKED'"
-      }
-    ],
-
-    quotes: [
-      "\"I'm not a psychopath, Anderson. I'm a high-functioning sociopath. Do your research.\"\n(난 사이코패스가 아니야 앤더슨. 고지능 소시오패스지. 공부 좀 해.)",
-      "\"Sentiment is a chemical defect found in the losing side.\"\n(감정은 패자에게서 발견되는 화학적 결함이지.)",
-      "\"You don't actually think I was interested in you. Why? Because you're the great Sherlock Holmes, the clever detective in the funny hat?\"\n(혹시 내가 정말 당신에게 관심이 있었다고 생각하는 건 아니죠? 왜요? 당신이 이상한 모자를 쓰고 다니는 똑똑한 탐정, 위대한 셜록홈즈라서?)\n\n\"No, because I took your pulse.\"\n(아니, 당신의 맥박을 쟀거든.)"
-    ]
-  },
-
-
-  {
-    id: "in-the-mood-for-love",
-    name: "홍콩 센트럴 구시가지 골목길",
-    type: "movie",
-    author: "왕가위 감독",
-    title: "《화양연화 (花樣年華)》",
-    latlng: [22.2830, 114.1536],
-    pinColor: "#9b2226",
-    tagBg: "#fae8e8",
-    tagColor: "#781418",
-    audioSrc: "love.mp3",
-    audioTitle: "Yumeji's Theme (love.mp3)",
-    startTime: 0,
-
-    photos: [
-      {
-        url: "love1.jpg",
-        caption: "1. 거울에 비친 두 사람과 붉은 벽지의 식당"
-      },
-      {
-        url: "love2.jpg",
-        caption: "2. 밤 골목 가로등 아래 스쳐 지나가는 순간"
-      },
-      {
-        url: "love3.jpg",
-        caption: "3. 어둠 속에서 조심스레 맞잡은 두 손"
-      },
-      {
-        url: "love4.jpg",
-        caption: "4. 택시 안에서 서로의 온기에 기대던 밤"
-      }
-    ],
-
-    quotes: [
-      "\"화양연화(花樣年華), 인생에서 가장 아름답고 행복한 순간.\"",
-      "\"그 시절은 지나갔고, 이제 거기 남은 것은 아무것도 없다.\"",
-      "\"배표 한 장 더 있으면, 나와 같이 갈래요?\"\n\"배표 한 장 더 있으면, 날 데려갈래요?\"",
-      "말하지 못한 사랑, 지나간 시간, 이미 늦어버린 사랑. 결국 화양연화는 사랑 영화가 아니라 지나가 버린 인생의 순간에 대한 영화였다는 걸 뒤늦게 깨닫게 됩니다."
-    ]
-  },
-
-
-  {
-    id: "decision-to-leave",
-    name: "대한민국 순천 송광사 (촬영지: 송광사 & 삼척 부남해수욕장)",
-    type: "movie",
-    author: "박찬욱 감독",
-    title: "《헤어질 결심 (Decision to Leave)》",
-    latlng: [34.9961, 127.2736],
-    pinColor: "#205560",
-    tagBg: "#e3eff1",
-    tagColor: "#163f47",
-    audioSrc: "leave.mp3",
-    audioTitle: "정훈희 & 송창식 - 안개 (leave.mp3)",
-    startTime: 0,
-
-    photos: [
-      {
-        url: "leave1.jpg",
-        caption: "1. 비 내리는 송광사에서 우산을 함께 쓴 순간"
-      },
-      {
-        url: "leave2.jpg",
-        caption: "2. 송광사 종루의 커다란 법고를 사이에 두고 마주 선 두 사람"
-      },
-      {
-        url: "leave3.jpg",
-        caption: "3. 일몰의 삼척 부남해변에서 슬픔에 젖은 해준"
-      },
-      {
-        url: "leave4.jpg",
-        caption: "4. 밀려오는 만조의 바다를 홀로 응시하는 서래의 뒷모습"
-      }
-    ],
-
-    quotes: [
-      "\"내가 그렇게 만만합니까?\"\n\"내가 그렇게 나쁩니까?\"",
-      "\"날 사랑한다고 말하는 순간 당신의 사랑이 끝났고, 당신의 사랑이 끝나는 순간 내 사랑이 시작됐죠.\"",
-      "\"나 너 땜에 고생 깨나 했지만, 사실 너 아니었으면 내 인생 공허했다, 요렇게 좀 전해주세요.\"",
-      "\"바다에 버려요. 깊은 데 빠뜨려서, 아무도 못 찾게 해요.\""
-    ]
-  },
-
-
-  {
-    id: "summer",
-    name: "미국 뉴잉글랜드 버크셔 지방",
-    type: "book",
-    author: "이디스 워튼 소설",
-    title: "《여름 (Summer)》",
-    latlng: [42.3458, -73.2384],
-    pinColor: "#6c804b",
-    tagBg: "#edf3e5",
-    tagColor: "#47592f",
-    audioSrc: "summer.mp3",
-    audioTitle: "여름 테마 (summer.mp3)",
-    startTime: 0,
-
-    photos: [
-      {
-        url: "summer1.jpg",
-        caption: "1. 햇살에 반짝이는 잔잔한 호숫가의 윤슬"
-      },
-      {
-        url: "summer2.jpg",
-        caption: "2. 여름 햇살이 쏟아지는 들판의 야생화들"
-      },
-      {
-        url: "summer3.jpg",
-        caption: "3. 맑은 호수와 푸른 숲을 잇는 고풍스러운 돌다리"
-      },
-      {
-        url: "summer4.jpg",
-        caption: "4. 나무 그늘 아래 풀밭에 누워 책을 읽던 오후"
-      }
-    ],
-
-    quotes: [
-      "채리티는 아직 모르는 게 많은 데다 감각이 무뎠는데, 그런 사실도 어렴풋하게만 알고있었다. 그러나 빛이며 공기, 향기, 색깔 같은 것들에 대해서는 몸속에 흐르는 피 한 방울 한 방울이 민감하게 반응했다.",
-      "잠시 그것에 대해 생각하지 않을 때면 채리티는 풀밭에 누워 너무 오랫동안 하늘을 올려다본 뒤 이따금 느꼈던 기분을 경험했다.",
-      "봄이 온갖 생명이 겨울잠에서 깨어나 기지개를 켜는 계절이고, 한여름이 무럭무럭 생장하여 활짝 꽃을 피우는 계절이라면, 가을은 결실을 맺고 조락하는 계절이다."
-    ]
-  },
-
-
-  {
-    id: "lalaland",
-    name: "미국 로스앤젤레스",
-    type: "movie",
-    author: "데이미언 셔젤 감독",
-    title: "《라라랜드 (La La Land)》",
-    latlng: [34.0522, -118.2437],
-    pinColor: "#69487d",
-    tagBg: "#f1eaf7",
-    tagColor: "#4c2e5e",
-    audioSrc: "lalaland.mp3",
-    audioTitle: "라라랜드 테마 (lalaland.mp3)",
-    startTime: 0,
-
-    photos: [
-      {
-        url: "lalaland1.jpg",
-        caption: "1. 보랏빛 매직아워의 언덕 벤치와 탭댄스"
-      },
-      {
-        url: "lalaland2.jpg",
-        caption: "2. 콜로라도 스트리트 브릿지를 함께 거닐던 저녁"
-      },
-      {
-        url: "lalaland3.jpg",
-        caption: "3. 황금빛 석양이 부서지는 낭만의 해변"
-      },
-      {
-        url: "lalaland4.jpg",
-        caption: "4. 푸른 야자수 너머로 올려다본 할리우드 언덕"
-      }
-    ],
-
-    quotes: [
-      "\"Where are we?\"\n(우린 지금 어디쯤 있는 걸까?)\n\n\"Just wait and see.\"\n(그냥 흘러가는 대로 지켜보자.)",
-      "\"Here's to the ones who dream, foolish as they may seem.\"\n(꿈꾸는 이들을 위하여, 비록 바보처럼 보일지라도.)",
-      "\"I'm always gonna love you.\"\n(언제나 널 사랑할 거야.)\n\n\"I'm always gonna love you, too.\"\n(나도 언제나 널 사랑할 거야.)"
-    ]
-  }
-
-];
-
-
-/* =========================================================
-   사용자 스토리 색상 자동 결정
-========================================================= */
-
-function getUserStoryPinColor(placeName) {
-
-  const colors = [
-    "#397f8f",
-    "#5f7891",
-    "#c87586",
-    "#668052",
-    "#c87542",
-    "#69527d",
-    "#8a6250",
-    "#8b6f47",
-    "#6d6875",
-    "#9b5963",
-    "#52796f",
-    "#806b5b"
-  ];
-
-  let hash = 0;
-
-  for (let i = 0; i < placeName.length; i++) {
-
-    hash =
-      placeName.charCodeAt(i) +
-      ((hash << 5) - hash);
-
-    hash |= 0;
-  }
-
-  return colors[
-    Math.abs(hash) % colors.length
-  ];
-}
-
-
-/* =========================================================
-   태그 색상도 핀에 맞춰 자동 생성
-========================================================= */
-
-function getTagColors(pinColor) {
-
-  return {
-    background:
-      pinColor + "22",
-
-    text:
-      pinColor
-  };
-}
-
-
-/* =========================================================
-   핀 생성
-========================================================= */
-
-function createMarker(item, isUserStory = false) {
-
-  const pinColor =
-    isUserStory
-      ? getUserStoryPinColor(item.name)
-      : item.pinColor;
-
-
-  const customIcon = L.divIcon({
-
-    className: "custom-pin",
-
-    html:
-      `<div class="pin-icon"
-        style="background-color:${pinColor};">
-      </div>`,
-
-    iconSize: [28, 28],
-
-    iconAnchor: [14, 28]
-
-  });
-
-
-  const marker =
-    L.marker(
-      item.latlng,
-      {
-        icon: customIcon
+        className: "warm-ivory-tile"
       }
     ).addTo(map);
 
 
-  marker.on("click", () => {
+    // ============================================================
+    // 이야기 데이터
+    // ============================================================
 
-    openStoryModal(
-      item,
-      isUserStory
-    );
+    let allStories = [...storyPlaces];
 
-  });
-
-
-  return marker;
-}
+    const markerGroups = {};
 
 
-/* =========================================================
-   기존 8개 핀 표시
-========================================================= */
+    // ============================================================
+    // 좌표를 같은 장소로 묶기
+    // ============================================================
 
-storyPlaces.forEach(item => {
+    function getLocationKey(latlng) {
 
-  createMarker(item, false);
+      return `${Number(latlng[0]).toFixed(4)},${Number(latlng[1]).toFixed(4)}`;
 
-});
-
-
-/* =========================================================
-   모달 DOM
-========================================================= */
-
-const modal =
-  document.getElementById("storyModal");
-
-const slideImg =
-  document.getElementById("slideImg");
-
-const slideBgBlur =
-  document.getElementById("slideBgBlur");
-
-const slideCaption =
-  document.getElementById("slideCaption");
-
-const sliderDots =
-  document.getElementById("sliderDots");
-
-const btnPrevSlide =
-  document.getElementById("btnPrevSlide");
-
-const btnNextSlide =
-  document.getElementById("btnNextSlide");
-
-const modalTag =
-  document.getElementById("modalTag");
-
-const modalAuthor =
-  document.getElementById("modalAuthor");
-
-const modalTitle =
-  document.getElementById("modalTitle");
-
-const modalPlace =
-  document.getElementById("modalPlace");
-
-const modalQuotes =
-  document.getElementById("modalQuotes");
-
-const musicBarContainer =
-  document.getElementById("musicBarContainer");
-
-const modalMusicTitle =
-  document.getElementById("modalMusicTitle");
-
-const deleteStoryBtn =
-  document.getElementById("deleteStoryBtn");
+    }
 
 
-let currentPhotos = [];
+    // ============================================================
+    // 새 장소 핀 색 자동 결정
+    // ============================================================
 
-let currentPhotoIndex = 0;
+    function getAutomaticPinColor(item) {
 
-let currentUserStoryId = null;
+      const text = `
+        ${item.name || ""}
+        ${item.title || ""}
+        ${item.author || ""}
+        ${item.quote || ""}
+      `.toLowerCase();
 
-
-/* =========================================================
-   Story 모달 열기
-========================================================= */
-
-function openStoryModal(item, isUserStory = false) {
-
-  currentPhotos =
-    item.photos || [];
-
-  currentPhotoIndex = 0;
-
-  currentUserStoryId =
-    isUserStory
-      ? item.id
-      : null;
-
-
-  if (isUserStory) {
-
-    modalTag.textContent =
-      "누군가의 이야기";
-
-    const colors =
-      getTagColors(
-        getUserStoryPinColor(item.name)
-      );
-
-    modalTag.style.backgroundColor =
-      colors.background;
-
-    modalTag.style.color =
-      colors.text;
-
-    modalAuthor.textContent =
-      item.nickname
-        ? `${item.nickname}의 이야기`
-        : "익명의 이야기";
-
-    modalTitle.textContent =
-      item.title || item.name;
-
-    modalPlace.textContent =
-      `📍 ${item.name}`;
-
-    deleteStoryBtn.style.display =
-      "block";
-
-  } else {
-
-    modalTag.textContent =
-      item.type === "book"
-        ? "소설 속 문장 & 실제 장소"
-        : item.type === "drama"
-          ? "드라마 속 명대사 & 장면"
-          : "영화 속 명대사 & 장면";
-
-    modalTag.style.backgroundColor =
-      item.tagBg;
-
-    modalTag.style.color =
-      item.tagColor;
-
-    modalAuthor.textContent =
-      item.author || "";
-
-    modalTitle.textContent =
-      item.title || "";
-
-    modalPlace.textContent =
-      `📍 ${item.name}`;
-
-    deleteStoryBtn.style.display =
-      "none";
-  }
-
-
-  modalQuotes.innerHTML = "";
-
-
-  (item.quotes || []).forEach(
-    (quote, idx) => {
-
-      const quoteEl =
-        document.createElement("div");
 
       if (
-        !isUserStory &&
-        (
-          item.id === "in-the-mood-for-love" ||
-          item.id === "summer"
-        ) &&
-        idx === item.quotes.length - 1
+        text.includes("바다") ||
+        text.includes("해변") ||
+        text.includes("sea") ||
+        text.includes("beach")
       ) {
-
-        quoteEl.className =
-          "quote-item commentary";
-
-      } else {
-
-        quoteEl.className =
-          "quote-item";
+        return "#397d8a";
       }
 
 
-      const pinColor =
-        isUserStory
-          ? getUserStoryPinColor(item.name)
-          : item.pinColor;
+      if (
+        text.includes("눈") ||
+        text.includes("겨울") ||
+        text.includes("설국") ||
+        text.includes("snow") ||
+        text.includes("winter")
+      ) {
+        return "#4e6a82";
+      }
 
 
-      quoteEl.style.borderLeftColor =
-        pinColor;
+      if (
+        text.includes("벚꽃") ||
+        text.includes("벚나무") ||
+        text.includes("사쿠라") ||
+        text.includes("cherry")
+      ) {
+        return "#c26d7b";
+      }
 
 
-      quoteEl.innerHTML =
-        escapeHtml(quote)
-          .replace(/\n/g, "<br>");
+      if (
+        text.includes("여름") ||
+        text.includes("summer")
+      ) {
+        return "#6c804b";
+      }
 
 
-      modalQuotes.appendChild(
-        quoteEl
-      );
+      if (
+        text.includes("사랑") ||
+        text.includes("love") ||
+        text.includes("로맨스")
+      ) {
+        return "#9b2226";
+      }
+
+
+      if (
+        text.includes("런던") ||
+        text.includes("홍콩") ||
+        text.includes("파리") ||
+        text.includes("뉴욕") ||
+        text.includes("도시")
+      ) {
+        return "#69487d";
+      }
+
+
+      return "#806653";
 
     }
-  );
 
 
-  if (
-    item.audioSrc &&
-    !isUserStory
-  ) {
+    // ============================================================
+    // Supabase 데이터 → 사이트 데이터
+    // ============================================================
 
-    musicBarContainer.style.display =
-      "flex";
+    function convertSupabaseStory(row) {
 
-    modalMusicTitle.textContent =
-      `재생 중: ${
-        item.audioTitle ||
-        item.audioSrc
-      }`;
+      return {
 
+        id: `user-${row.id}`,
 
-    if (isMainBgmPlaying) {
+        dbId: row.id,
 
-      mainBgm.pause();
+        isUserStory: true,
+
+        name: row.city_name,
+
+        type: "user",
+
+        author: row.nickname
+          ? `by ${row.nickname}`
+          : "익명의 이야기",
+
+        title: row.city_name,
+
+        latlng: [
+          Number(row.lat),
+          Number(row.lng)
+        ],
+
+        pinColor: getAutomaticPinColor(row),
+
+        tagBg: "#eee7dc",
+
+        tagColor: "#6b5b4d",
+
+        photos: row.image_url
+          ? [
+              {
+                url: row.image_url,
+                caption: "사용자가 남긴 사진"
+              }
+            ]
+          : [],
+
+        quotes: row.quote
+          ? [row.quote]
+          : [],
+
+        nickname: row.nickname,
+
+        created_at: row.created_at
+
+      };
 
     }
 
 
-    placeAudio.src =
-      item.audioSrc;
+    // ============================================================
+    // DB에서 사용자 이야기 가져오기
+    // ============================================================
 
-    placeAudio.currentTime =
-      item.startTime || 0;
+    async function loadUserStories() {
 
-    placeAudio.play()
-      .catch(() => {});
+      try {
 
+        const rows = await supabaseRequest(
+          `${TABLE_URL}?select=*`
+        );
 
-  } else {
+        const userStories =
+          (rows || []).map(convertSupabaseStory);
 
-    musicBarContainer.style.display =
-      "none";
+        allStories = [
+          ...storyPlaces,
+          ...userStories
+        ];
 
-    placeAudio.pause();
+        renderAllMarkers();
 
-  }
+      } catch (error) {
 
-
-  renderSlide();
-
-  modal.classList.add(
-    "active"
-  );
-}
-
-
-/* =========================================================
-   HTML 특수문자 방지
-========================================================= */
-
-function escapeHtml(text) {
-
-  const div =
-    document.createElement("div");
-
-  div.textContent =
-    text || "";
-
-  return div.innerHTML;
-}
-
-
-/* =========================================================
-   사진 슬라이더
-========================================================= */
-
-function renderSlide() {
-
-  if (
-    currentPhotos.length === 0
-  ) {
-
-    slideImg.src = "";
-
-    slideCaption.textContent =
-      "";
-
-    return;
-  }
-
-
-  const current =
-    currentPhotos[
-      currentPhotoIndex
-    ];
-
-
-  slideImg.src =
-    current.url;
-
-  slideBgBlur.style.backgroundImage =
-    `url('${current.url}')`;
-
-  slideCaption.textContent =
-    current.caption || "";
-
-
-  if (
-    currentPhotos.length > 1
-  ) {
-
-    btnPrevSlide.style.display =
-      "flex";
-
-    btnNextSlide.style.display =
-      "flex";
-
-    sliderDots.style.display =
-      "flex";
-
-
-    sliderDots.innerHTML = "";
-
-
-    currentPhotos.forEach(
-      (_, idx) => {
-
-        const dot =
-          document.createElement("div");
-
-        dot.className =
-          `dot ${
-            idx === currentPhotoIndex
-              ? "active"
-              : ""
-          }`;
-
-        dot.onclick = () =>
-          goToSlide(idx);
-
-        sliderDots.appendChild(
-          dot
+        console.error(
+          "사용자 이야기를 불러오지 못했습니다:",
+          error
         );
 
       }
-    );
 
-
-  } else {
-
-    btnPrevSlide.style.display =
-      "none";
-
-    btnNextSlide.style.display =
-      "none";
-
-    sliderDots.style.display =
-      "none";
-
-  }
-}
-
-
-function prevSlide() {
-
-  if (
-    currentPhotos.length <= 1
-  ) return;
-
-  currentPhotoIndex =
-    (
-      currentPhotoIndex -
-      1 +
-      currentPhotos.length
-    ) %
-    currentPhotos.length;
-
-  renderSlide();
-}
-
-
-function nextSlide() {
-
-  if (
-    currentPhotos.length <= 1
-  ) return;
-
-  currentPhotoIndex =
-    (
-      currentPhotoIndex +
-      1
-    ) %
-    currentPhotos.length;
-
-  renderSlide();
-}
-
-
-function goToSlide(idx) {
-
-  currentPhotoIndex =
-    idx;
-
-  renderSlide();
-}
-
-
-/* =========================================================
-   Story 모달 닫기
-========================================================= */
-
-function closeModal() {
-
-  modal.classList.remove(
-    "active"
-  );
-
-  placeAudio.pause();
-
-  placeAudio.currentTime =
-    0;
-
-
-  if (isMainBgmPlaying) {
-
-    mainBgm.play()
-      .catch(() => {});
-
-  }
-
-  currentUserStoryId =
-    null;
-}
-
-
-function handleOverlayClick(event) {
-
-  if (
-    event.target === modal
-  ) {
-
-    closeModal();
-
-  }
-}
-
-
-/* =========================================================
-   Add Your Story 모달
-========================================================= */
-
-const addStoryModal =
-  document.getElementById(
-    "addStoryModal"
-  );
-
-
-function openAddStoryModal() {
-
-  addStoryModal.classList.add(
-    "active"
-  );
-
-}
-
-
-function closeAddStoryModal() {
-
-  addStoryModal.classList.remove(
-    "active"
-  );
-
-}
-
-
-function handleAddOverlayClick(event) {
-
-  if (
-    event.target === addStoryModal
-  ) {
-
-    closeAddStoryModal();
-
-  }
-
-}
-
-
-/* =========================================================
-   Supabase에 Story 저장
-========================================================= */
-
-async function submitStory(event) {
-
-  event.preventDefault();
-
-
-  const submitBtn =
-    document.getElementById(
-      "submitStoryBtn"
-    );
-
-  const message =
-    document.getElementById(
-      "formMessage"
-    );
-
-
-  const nickname =
-    document.getElementById(
-      "nickname"
-    ).value.trim();
-
-
-  const cityName =
-    document.getElementById(
-      "cityName"
-    ).value.trim();
-
-
-  const latitude =
-    parseFloat(
-      document.getElementById(
-        "latitude"
-      ).value
-    );
-
-
-  const longitude =
-    parseFloat(
-      document.getElementById(
-        "longitude"
-      ).value
-    );
-
-
-  const quote =
-    document.getElementById(
-      "quote"
-    ).value.trim();
-
-
-  const imageInput =
-    document.getElementById(
-      "storyImage"
-    );
-
-
-  const file =
-    imageInput.files[0];
-
-
-  message.textContent =
-    "";
-
-
-  if (!nickname) {
-
-    message.textContent =
-      "닉네임을 입력해주세요.";
-
-    return;
-  }
-
-
-  if (!cityName) {
-
-    message.textContent =
-      "장소를 입력해주세요.";
-
-    return;
-  }
-
-
-  if (
-    isNaN(latitude) ||
-    latitude < -90 ||
-    latitude > 90
-  ) {
-
-    message.textContent =
-      "위도는 -90에서 90 사이로 입력해주세요.";
-
-    return;
-  }
-
-
-  if (
-    isNaN(longitude) ||
-    longitude < -180 ||
-    longitude > 180
-  ) {
-
-    message.textContent =
-      "경도는 -180에서 180 사이로 입력해주세요.";
-
-    return;
-  }
-
-
-  if (!file) {
-
-    message.textContent =
-      "사진을 선택해주세요.";
-
-    return;
-  }
-
-
-  try {
-
-    submitBtn.disabled =
-      true;
-
-    submitBtn.textContent =
-      "업로드 중...";
-
-
-    /* -------------------------
-       1. 사진 파일명 생성
-    ------------------------- */
-
-    const extension =
-      file.name
-        .split(".")
-        .pop()
-        .toLowerCase();
-
-
-    const uniqueFileName =
-      `${Date.now()}-${Math.random()
-        .toString(36)
-        .substring(2, 9)}.${extension}`;
-
-
-    const storagePath =
-      `user-stories/${uniqueFileName}`;
-
-
-    /* -------------------------
-       2. Storage 업로드
-    ------------------------- */
-
-    const uploadResponse =
-      await fetch(
-        `${SUPABASE_URL}/storage/v1/object/${STORAGE_BUCKET}/${storagePath}`,
-        {
-
-          method: "POST",
-
-          headers: {
-
-            apikey:
-              SUPABASE_KEY,
-
-            Authorization:
-              `Bearer ${SUPABASE_KEY}`,
-
-            "Content-Type":
-              file.type
-
-          },
-
-          body: file
-
-        }
-      );
-
-
-    if (!uploadResponse.ok) {
-
-      const errorText =
-        await uploadResponse.text();
-
-      console.error(
-        "Storage upload error:",
-        errorText
-      );
-
-      throw new Error(
-        "사진 업로드에 실패했습니다."
-      );
     }
 
 
-    /* -------------------------
-       3. 공개 이미지 URL 생성
-    ------------------------- */
+    // ============================================================
+    // 모든 핀 표시
+    // ============================================================
 
-    const imageUrl =
-      `${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${storagePath}`;
+    function renderAllMarkers() {
 
+      // 기존 마커 제거
 
-    /* -------------------------
-       4. Database 저장
-    ------------------------- */
+      Object.values(markerGroups).forEach(group => {
 
-    const insertResponse =
-      await fetch(
-        CITY_TABLE,
-        {
+        group.forEach(item => {
 
-          method: "POST",
+          if (item.marker) {
 
-          headers: {
-
-            apikey:
-              SUPABASE_KEY,
-
-            Authorization:
-              `Bearer ${SUPABASE_KEY}`,
-
-            "Content-Type":
-              "application/json",
-
-            Prefer:
-              "return=representation"
-
-          },
-
-          body: JSON.stringify({
-
-            city_name:
-              cityName,
-
-            image_url:
-              imageUrl,
-
-            nickname:
-              nickname,
-
-            quote:
-              quote,
-
-            lat:
-              latitude,
-
-            lng:
-              longitude
-
-          })
-
-        }
-      );
-
-
-    if (!insertResponse.ok) {
-
-      const errorText =
-        await insertResponse.text();
-
-      console.error(
-        "Database insert error:",
-        errorText
-      );
-
-      throw new Error(
-        "이야기 저장에 실패했습니다."
-      );
-    }
-
-
-    const savedRows =
-      await insertResponse.json();
-
-
-    const savedStory =
-      savedRows[0];
-
-
-    /* -------------------------
-       5. 새 장소를 지도에 즉시 표시
-    ------------------------- */
-
-    const newStory = {
-
-      id:
-        savedStory.id,
-
-      name:
-        savedStory.city_name,
-
-      nickname:
-        savedStory.nickname,
-
-      title:
-        savedStory.city_name,
-
-      latlng: [
-
-        Number(
-          savedStory.lat
-        ),
-
-        Number(
-          savedStory.lng
-        )
-
-      ],
-
-      photos: [
-
-        {
-
-          url:
-            savedStory.image_url,
-
-          caption:
-            `${savedStory.nickname}의 사진`
-
-        }
-
-      ],
-
-      quotes: [
-
-        savedStory.quote
-
-      ]
-
-    };
-
-
-    createMarker(
-      newStory,
-      true
-    );
-
-
-    /* -------------------------
-       6. 완료
-    ------------------------- */
-
-    message.style.color =
-      "#668052";
-
-    message.textContent =
-      "이야기가 지도에 남겨졌어요.";
-
-
-    document.getElementById(
-      "storyForm"
-    ).reset();
-
-
-    setTimeout(() => {
-
-      closeAddStoryModal();
-
-      message.textContent = "";
-
-      message.style.color =
-        "#9e5843";
-
-    }, 900);
-
-
-  } catch (error) {
-
-    console.error(error);
-
-    message.style.color =
-      "#9e5843";
-
-    message.textContent =
-      error.message ||
-      "오류가 발생했습니다.";
-
-
-  } finally {
-
-    submitBtn.disabled =
-      false;
-
-    submitBtn.textContent =
-      "이야기 남기기";
-
-  }
-}
-
-
-/* =========================================================
-   Supabase에서 사용자 Story 불러오기
-========================================================= */
-
-async function loadUserStories() {
-
-  try {
-
-    const response =
-      await fetch(
-        `${CITY_TABLE}?select=*`,
-        {
-
-          method: "GET",
-
-          headers: {
-
-            apikey:
-              SUPABASE_KEY,
-
-            Authorization:
-              `Bearer ${SUPABASE_KEY}`
+            map.removeLayer(item.marker);
 
           }
 
-        }
-      );
-
-
-    if (!response.ok) {
-
-      const errorText =
-        await response.text();
-
-      console.error(
-        "Story load error:",
-        errorText
-      );
-
-      return;
-    }
-
-
-    const rows =
-      await response.json();
-
-
-    rows.forEach(
-      row => {
-
-        if (
-          row.lat === null ||
-          row.lng === null
-        ) {
-
-          return;
-        }
-
-
-        if (
-          !row.image_url
-        ) {
-
-          return;
-        }
-
-
-        const userStory = {
-
-          id:
-            row.id,
-
-          name:
-            row.city_name,
-
-          nickname:
-            row.nickname,
-
-          title:
-            row.city_name,
-
-          latlng: [
-
-            Number(row.lat),
-
-            Number(row.lng)
-
-          ],
-
-          photos: [
-
-            {
-
-              url:
-                row.image_url,
-
-              caption:
-                `${row.nickname || "누군가"}의 사진`
-
-            }
-
-          ],
-
-          quotes: [
-
-            row.quote ||
-            ""
-
-          ]
-
-        };
-
-
-        createMarker(
-          userStory,
-          true
-        );
+        });
 
       });
 
 
-  } catch (error) {
+      // 그룹 초기화
 
-    console.error(
-      "사용자 스토리를 불러오는 중 오류:",
-      error
-    );
+      Object.keys(markerGroups).forEach(key => {
 
-  }
-}
+        delete markerGroups[key];
+
+      });
 
 
-/* =========================================================
-   사용자 Story 삭제
-========================================================= */
+      // 같은 좌표끼리 묶기
 
-async function deleteCurrentUserStory() {
+      allStories.forEach(item => {
 
-  if (
-    !currentUserStoryId
-  ) {
+        if (
+          !item.latlng ||
+          item.latlng.length !== 2 ||
+          isNaN(item.latlng[0]) ||
+          isNaN(item.latlng[1])
+        ) {
+          return;
+        }
 
-    return;
+        const key =
+          getLocationKey(item.latlng);
 
-  }
+        if (!markerGroups[key]) {
 
+          markerGroups[key] = [];
 
-  const confirmed =
-    confirm(
-      "이 이야기를 정말 삭제할까요?"
-    );
+        }
 
+        markerGroups[key].push(item);
 
-  if (!confirmed) {
-
-    return;
-
-  }
-
-
-  try {
-
-    deleteStoryBtn.disabled =
-      true;
-
-    deleteStoryBtn.textContent =
-      "삭제 중...";
+      });
 
 
-    const response =
-      await fetch(
-        `${CITY_TABLE}?id=eq.${encodeURIComponent(currentUserStoryId)}`,
-        {
+      // 핀 생성
 
-          method: "DELETE",
+      Object.values(markerGroups).forEach(group => {
 
-          headers: {
+        const first =
+          group[0];
 
-            apikey:
-              SUPABASE_KEY,
 
-            Authorization:
-              `Bearer ${SUPABASE_KEY}`,
+        // ================================================
+        // 한 개의 이야기
+        // ================================================
 
-            Prefer:
-              "return=minimal"
+        if (group.length === 1) {
 
-          }
+          const item = group[0];
+
+
+          const icon =
+            L.divIcon({
+
+              className: "custom-pin",
+
+              html: `
+                <div
+                  class="pin-icon"
+                  style="
+                    background-color:
+                    ${item.pinColor || getAutomaticPinColor(item)};
+                  "
+                ></div>
+              `,
+
+              iconSize: [28,28],
+
+              iconAnchor: [14,28]
+
+            });
+
+
+          const marker =
+            L.marker(
+              item.latlng,
+              {
+                icon
+              }
+            ).addTo(map);
+
+
+          marker.on(
+            "click",
+            () => openStoryModal(item)
+          );
+
+
+          item.marker = marker;
+
+        }
+
+
+        // ================================================
+        // 여러 이야기
+        // ================================================
+
+        else {
+
+          const icon =
+            L.divIcon({
+
+              className: "",
+
+              html: `
+                <div class="story-cluster-pin">
+                  ${group.length}
+                </div>
+              `,
+
+              iconSize: [42,42],
+
+              iconAnchor: [21,21]
+
+            });
+
+
+          const marker =
+            L.marker(
+              first.latlng,
+              {
+                icon
+              }
+            ).addTo(map);
+
+
+          marker.on(
+            "click",
+            () => openStoryList(group)
+          );
+
+
+          group.forEach(item => {
+
+            item.marker = marker;
+
+          });
+
+        }
+
+      });
+
+    }
+
+
+    // ============================================================
+    // STORY LIST
+    // ============================================================
+
+    function openStoryList(group) {
+
+      const modal =
+        document.getElementById("storyListModal");
+
+      const title =
+        document.getElementById("storyListTitle");
+
+      const place =
+        document.getElementById("storyListPlace");
+
+      const items =
+        document.getElementById("storyListItems");
+
+
+      title.textContent =
+        `${group.length}개의 이야기`;
+
+
+      place.textContent =
+        `📍 ${group[0].name}`;
+
+
+      items.innerHTML = "";
+
+
+      group.forEach(item => {
+
+        const button =
+          document.createElement("button");
+
+        button.className =
+          "story-list-item";
+
+
+        button.innerHTML = `
+
+          <div class="story-list-item-title">
+            ${escapeHtml(
+              item.title ||
+              item.name ||
+              "이야기"
+            )}
+          </div>
+
+          <div class="story-list-item-author">
+            ${escapeHtml(
+              item.nickname ||
+              item.author ||
+              "익명의 이야기"
+            )}
+          </div>
+
+        `;
+
+
+        button.onclick = () => {
+
+          closeStoryList();
+
+          setTimeout(
+            () => openStoryModal(item),
+            100
+          );
+
+        };
+
+
+        items.appendChild(button);
+
+      });
+
+
+      modal.style.display = "flex";
+
+    }
+
+
+    function closeStoryList() {
+
+      document.getElementById(
+        "storyListModal"
+      ).style.display = "none";
+
+    }
+
+
+    // ============================================================
+    // DETAIL MODAL
+    // ============================================================
+
+    const modal =
+      document.getElementById("storyModal");
+
+    const slideImg =
+      document.getElementById("slideImg");
+
+    const slideBgBlur =
+      document.getElementById("slideBgBlur");
+
+    const slideCaption =
+      document.getElementById("slideCaption");
+
+    const sliderDots =
+      document.getElementById("sliderDots");
+
+    const btnPrevSlide =
+      document.getElementById("btnPrevSlide");
+
+    const btnNextSlide =
+      document.getElementById("btnNextSlide");
+
+    const modalTag =
+      document.getElementById("modalTag");
+
+    const modalAuthor =
+      document.getElementById("modalAuthor");
+
+    const modalTitle =
+      document.getElementById("modalTitle");
+
+    const modalPlace =
+      document.getElementById("modalPlace");
+
+    const modalQuotes =
+      document.getElementById("modalQuotes");
+
+    const modalUserInfo =
+      document.getElementById("modalUserInfo");
+
+
+    let currentPhotos = [];
+
+    let currentPhotoIndex = 0;
+
+    let currentStory = null;
+
+
+    // ============================================================
+    // HTML 안전 처리
+    // ============================================================
+
+    function escapeHtml(value) {
+
+      if (value === null || value === undefined) {
+        return "";
+      }
+
+      return String(value)
+
+        .replace(/&/g, "&amp;")
+
+        .replace(/</g, "&lt;")
+
+        .replace(/>/g, "&gt;")
+
+        .replace(/"/g, "&quot;")
+
+        .replace(/'/g, "&#039;");
+
+    }
+
+
+    // ============================================================
+    // 이야기 상세 열기
+    // ============================================================
+
+    function openStoryModal(item) {
+
+      currentStory = item;
+
+      currentPhotos =
+        item.photos || [];
+
+      currentPhotoIndex = 0;
+
+
+      if (item.isUserStory) {
+
+        modalTag.textContent =
+          "사용자가 남긴 이야기";
+
+        modalTag.style.backgroundColor =
+          "#eee7dc";
+
+        modalTag.style.color =
+          "#6b5b4d";
+
+      }
+
+      else {
+
+        modalTag.textContent =
+          item.type === "book"
+            ? "소설 속 문장 & 실제 장소"
+            : item.type === "drama"
+              ? "드라마 속 명대사 & 장면"
+              : "영화 속 명대사 & 장면";
+
+        modalTag.style.backgroundColor =
+          item.tagBg;
+
+        modalTag.style.color =
+          item.tagColor;
+
+      }
+
+
+      modalAuthor.textContent =
+        item.isUserStory
+          ? `by ${item.nickname || "익명의 사용자"}`
+          : item.author || "";
+
+
+      modalTitle.textContent =
+        item.title || "";
+
+
+      modalPlace.textContent =
+        `📍 ${item.name || ""}`;
+
+
+      modalQuotes.innerHTML = "";
+
+
+      (item.quotes || []).forEach(
+        quote => {
+
+          const quoteEl =
+            document.createElement("div");
+
+          quoteEl.className =
+            "quote-item";
+
+          quoteEl.style.borderLeftColor =
+            item.pinColor ||
+            getAutomaticPinColor(item);
+
+
+          quoteEl.textContent =
+            quote;
+
+
+          modalQuotes.appendChild(
+            quoteEl
+          );
 
         }
       );
 
 
-    if (!response.ok) {
+      // 사용자 이야기 정보
 
-      const errorText =
-        await response.text();
+      modalUserInfo.innerHTML = "";
 
-      console.error(
-        "Delete error:",
-        errorText
-      );
 
-      throw new Error(
-        "삭제에 실패했습니다."
-      );
+      if (item.isUserStory) {
+
+        const label =
+          document.createElement("span");
+
+        label.className =
+          "user-story-label";
+
+        label.textContent =
+          `이야기를 남긴 사람 · ${
+            item.nickname || "익명"
+          }`;
+
+
+        modalUserInfo.appendChild(
+          label
+        );
+
+
+        // 사용자 이야기 삭제 버튼
+
+        const deleteButton =
+          document.createElement("button");
+
+        deleteButton.className =
+          "delete-story-btn";
+
+        deleteButton.textContent =
+          "이 이야기 삭제";
+
+
+        deleteButton.onclick =
+          () => deleteUserStory(item);
+
+
+        modalUserInfo.appendChild(
+          deleteButton
+        );
+
+      }
+
+
+      renderSlide();
+
+      modal.classList.add("active");
+
     }
 
 
-    closeModal();
+    // ============================================================
+    // SLIDER
+    // ============================================================
+
+    function renderSlide() {
+
+      if (!currentPhotos.length) {
+
+        slideImg.style.display = "none";
+
+        slideBgBlur.style.backgroundImage =
+          "none";
+
+        slideCaption.textContent =
+          "사진이 없습니다.";
+
+        btnPrevSlide.style.display =
+          "none";
+
+        btnNextSlide.style.display =
+          "none";
+
+        sliderDots.style.display =
+          "none";
+
+        return;
+
+      }
 
 
-    alert(
-      "이야기가 삭제되었습니다."
-    );
+      slideImg.style.display =
+        "block";
 
 
-    location.reload();
+      const current =
+        currentPhotos[currentPhotoIndex];
 
 
-  } catch (error) {
-
-    console.error(error);
-
-    alert(
-      error.message ||
-      "삭제 중 오류가 발생했습니다."
-    );
+      slideImg.src =
+        current.url;
 
 
-  } finally {
-
-    deleteStoryBtn.disabled =
-      false;
-
-    deleteStoryBtn.textContent =
-      "🗑 이 이야기 삭제하기";
-
-  }
-}
+      slideBgBlur.style.backgroundImage =
+        `url("${current.url}")`;
 
 
-/* =========================================================
-   초기 위치
-========================================================= */
+      slideCaption.textContent =
+        current.caption || "";
 
-function resetView() {
 
-  map.flyTo(
-    initialCenter,
-    initialZoom,
-    {
-      duration: 1.2
+      if (currentPhotos.length > 1) {
+
+        btnPrevSlide.style.display =
+          "flex";
+
+        btnNextSlide.style.display =
+          "flex";
+
+        sliderDots.style.display =
+          "flex";
+
+
+        sliderDots.innerHTML = "";
+
+
+        currentPhotos.forEach(
+          (_, index) => {
+
+            const dot =
+              document.createElement("div");
+
+            dot.className =
+              `dot ${
+                index === currentPhotoIndex
+                  ? "active"
+                  : ""
+              }`;
+
+
+            dot.onclick =
+              () => goToSlide(index);
+
+
+            sliderDots.appendChild(
+              dot
+            );
+
+          }
+        );
+
+      }
+
+      else {
+
+        btnPrevSlide.style.display =
+          "none";
+
+        btnNextSlide.style.display =
+          "none";
+
+        sliderDots.style.display =
+          "none";
+
+      }
+
     }
-  );
-
-}
 
 
-/* =========================================================
-   키보드
-========================================================= */
+    function prevSlide() {
 
-window.addEventListener(
-  "keydown",
-  (e) => {
+      if (currentPhotos.length <= 1)
+        return;
 
-    if (
-      modal.classList.contains(
-        "active"
-      )
-    ) {
+      currentPhotoIndex =
+        (
+          currentPhotoIndex -
+          1 +
+          currentPhotos.length
+        ) %
+        currentPhotos.length;
 
-      if (
-        e.key === "Escape"
-      ) {
+      renderSlide();
+
+    }
+
+
+    function nextSlide() {
+
+      if (currentPhotos.length <= 1)
+        return;
+
+      currentPhotoIndex =
+        (
+          currentPhotoIndex + 1
+        ) %
+        currentPhotos.length;
+
+      renderSlide();
+
+    }
+
+
+    function goToSlide(index) {
+
+      currentPhotoIndex =
+        index;
+
+      renderSlide();
+
+    }
+
+
+    function closeModal() {
+
+      modal.classList.remove("active");
+
+      currentStory = null;
+
+    }
+
+
+    function handleOverlayClick(event) {
+
+      if (event.target === modal) {
 
         closeModal();
 
       }
 
-      if (
-        e.key === "ArrowLeft"
-      ) {
+    }
 
-        prevSlide();
+
+    // ============================================================
+    // ADD STORY
+    // ============================================================
+
+    function openAddStoryModal() {
+
+      document.getElementById(
+        "addStoryModal"
+      ).style.display = "flex";
+
+    }
+
+
+    function closeAddStoryModal() {
+
+      document.getElementById(
+        "addStoryModal"
+      ).style.display = "none";
+
+    }
+
+
+    // ============================================================
+    // 이미지 미리보기
+    // ============================================================
+
+    function previewStoryImage(event) {
+
+      const file =
+        event.target.files[0];
+
+      const preview =
+        document.getElementById(
+          "imagePreview"
+        );
+
+
+      if (!file) {
+
+        preview.style.display =
+          "none";
+
+        return;
 
       }
 
+
+      preview.src =
+        URL.createObjectURL(file);
+
+      preview.style.display =
+        "block";
+
+    }
+
+
+    // ============================================================
+    // 이야기 추가
+    // ============================================================
+
+    async function submitStory() {
+
+      const nickname =
+        document.getElementById(
+          "storyNickname"
+        ).value.trim();
+
+
+      const cityName =
+        document.getElementById(
+          "storyCity"
+        ).value.trim();
+
+
+      const lat =
+        Number(
+          document.getElementById(
+            "storyLat"
+          ).value
+        );
+
+
+      const lng =
+        Number(
+          document.getElementById(
+            "storyLng"
+          ).value
+        );
+
+
+      const quote =
+        document.getElementById(
+          "storyQuote"
+        ).value.trim();
+
+
+      const imageInput =
+        document.getElementById(
+          "storyImage"
+        );
+
+
+      const file =
+        imageInput.files[0];
+
+
+      // =========================
+      // 입력 확인
+      // =========================
+
+      if (!nickname) {
+
+        alert(
+          "닉네임을 입력해주세요."
+        );
+
+        return;
+
+      }
+
+
+      if (!cityName) {
+
+        alert(
+          "장소 이름을 입력해주세요."
+        );
+
+        return;
+
+      }
+
+
       if (
-        e.key === "ArrowRight"
+        !Number.isFinite(lat) ||
+        !Number.isFinite(lng)
       ) {
 
-        nextSlide();
+        alert(
+          "위도와 경도를 정확하게 입력해주세요."
+        );
+
+        return;
+
+      }
+
+
+      if (!file) {
+
+        alert(
+          "사진을 선택해주세요."
+        );
+
+        return;
+
+      }
+
+
+      const submitButton =
+        document.getElementById(
+          "submitStoryButton"
+        );
+
+
+      try {
+
+        submitButton.disabled =
+          true;
+
+        submitButton.textContent =
+          "업로드 중...";
+
+
+        // =====================================================
+        // 1. 사진 파일명 만들기
+        // =====================================================
+
+        const extension =
+          file.name.includes(".")
+            ? file.name.split(".").pop()
+            : "jpg";
+
+
+        const fileName =
+          `${Date.now()}-${Math.random()
+            .toString(36)
+            .substring(2)}.${extension}`;
+
+
+        // =====================================================
+        // 2. Storage 업로드
+        // =====================================================
+
+        const uploadUrl =
+          `${SUPABASE_URL}/storage/v1/object/city-images/${fileName}`;
+
+
+        const uploadResponse =
+          await fetch(
+            uploadUrl,
+            {
+
+              method: "POST",
+
+              headers: {
+
+                "apikey":
+                  SUPABASE_KEY,
+
+                "Authorization":
+                  `Bearer ${SUPABASE_KEY}`,
+
+                "Content-Type":
+                  file.type || "image/jpeg",
+
+                "x-upsert":
+                  "false"
+
+              },
+
+              body: file
+
+            }
+          );
+
+
+        if (!uploadResponse.ok) {
+
+          const error =
+            await uploadResponse.text();
+
+          throw new Error(
+            `사진 업로드 실패: ${error}`
+          );
+
+        }
+
+
+        // =====================================================
+        // 3. 공개 이미지 URL
+        // =====================================================
+
+        const imageUrl =
+          `${STORAGE_URL}/${fileName}`;
+
+
+        // =====================================================
+        // 4. Database에 정보 저장
+        // =====================================================
+
+        const newStory = {
+
+          city_name: cityName,
+
+          image_url: imageUrl,
+
+          lat: lat,
+
+          lng: lng,
+
+          nickname: nickname,
+
+          quote: quote
+
+        };
+
+
+        await supabaseRequest(
+          TABLE_URL,
+          {
+
+            method: "POST",
+
+            headers: {
+
+              "Content-Type":
+                "application/json",
+
+              "Prefer":
+                "return=minimal"
+
+            },
+
+            body:
+              JSON.stringify(newStory)
+
+          }
+        );
+
+
+        // =====================================================
+        // 5. 성공
+        // =====================================================
+
+        alert(
+          "이야기가 지도에 추가되었습니다! ✨"
+        );
+
+
+        closeAddStoryModal();
+
+
+        // 폼 초기화
+
+        document.getElementById(
+          "storyNickname"
+        ).value = "";
+
+
+        document.getElementById(
+          "storyCity"
+        ).value = "";
+
+
+        document.getElementById(
+          "storyLat"
+        ).value = "";
+
+
+        document.getElementById(
+          "storyLng"
+        ).value = "";
+
+
+        document.getElementById(
+          "storyQuote"
+        ).value = "";
+
+
+        imageInput.value = "";
+
+
+        document.getElementById(
+          "imagePreview"
+        ).style.display =
+          "none";
+
+
+        // DB 다시 읽기
+
+        await loadUserStories();
+
+
+      }
+
+      catch (error) {
+
+        console.error(error);
+
+        alert(
+          "이야기를 추가하는 중 오류가 발생했습니다.\n\n" +
+          error.message
+        );
+
+      }
+
+      finally {
+
+        submitButton.disabled =
+          false;
+
+        submitButton.textContent =
+          "이야기 추가하기";
 
       }
 
     }
 
 
-    if (
-      addStoryModal.classList.contains(
-        "active"
-      ) &&
-      e.key === "Escape"
-    ) {
+    // ============================================================
+    // 사용자 이야기 삭제
+    // ============================================================
 
-      closeAddStoryModal();
+    async function deleteUserStory(item) {
+
+      if (!item.dbId) {
+
+        alert(
+          "기존에 등록되어 있는 장소는 삭제할 수 없습니다."
+        );
+
+        return;
+
+      }
+
+
+      const confirmed =
+        confirm(
+          "정말 이 이야기를 삭제할까요?"
+        );
+
+
+      if (!confirmed) return;
+
+
+      try {
+
+        await supabaseRequest(
+          `${TABLE_URL}?id=eq.${encodeURIComponent(
+            item.dbId
+          )}`,
+          {
+
+            method: "DELETE",
+
+            headers: {
+
+              "Prefer":
+                "return=minimal"
+
+            }
+
+          }
+        );
+
+
+        alert(
+          "이야기가 삭제되었습니다."
+        );
+
+
+        closeModal();
+
+        await loadUserStories();
+
+
+      }
+
+      catch (error) {
+
+        console.error(error);
+
+        alert(
+          "삭제 중 오류가 발생했습니다.\n\n" +
+          error.message
+        );
+
+      }
 
     }
 
-  }
-);
+
+    // ============================================================
+    // 키보드
+    // ============================================================
+
+    window.addEventListener(
+      "keydown",
+      event => {
+
+        if (
+          !modal.classList.contains(
+            "active"
+          )
+        ) {
+          return;
+        }
 
 
-/* =========================================================
-   페이지가 열리면 Supabase Story 불러오기
-========================================================= */
+        if (
+          event.key === "Escape"
+        ) {
 
-loadUserStories();
+          closeModal();
 
-</script>
+        }
+
+
+        if (
+          event.key === "ArrowLeft"
+        ) {
+
+          prevSlide();
+
+        }
+
+
+        if (
+          event.key === "ArrowRight"
+        ) {
+
+          nextSlide();
+
+        }
+
+      }
+    );
+
+
+    // ============================================================
+    // 초기 위치
+    // ============================================================
+
+    function resetView() {
+
+      map.flyTo(
+        initialCenter,
+        initialZoom,
+        {
+          duration: 1.2
+        }
+      );
+
+    }
+
+
+    // ============================================================
+    // 배경 음악
+    // ============================================================
+
+    const mainBgm =
+      new Audio("main.mp3");
+
+    mainBgm.loop = true;
+
+    mainBgm.volume = .35;
+
+    let isMainBgmPlaying = false;
+
+
+    function toggleMainBgm() {
+
+      if (isMainBgmPlaying) {
+
+        mainBgm.pause();
+
+        isMainBgmPlaying = false;
+
+      }
+
+      else {
+
+        mainBgm.play()
+          .then(() => {
+
+            isMainBgmPlaying = true;
+
+            updateBgmButtonUI();
+
+          })
+          .catch(() => {});
+
+      }
+
+
+      updateBgmButtonUI();
+
+    }
+
+
+    function updateBgmButtonUI() {
+
+      const icon =
+        document.getElementById(
+          "bgmIcon"
+        );
+
+      const text =
+        document.getElementById(
+          "bgmText"
+        );
+
+
+      if (isMainBgmPlaying) {
+
+        icon.textContent = "🎵";
+
+        text.textContent =
+          "배경음악 ON";
+
+      }
+
+      else {
+
+        icon.textContent = "🔇";
+
+        text.textContent =
+          "배경음악 OFF";
+
+      }
+
+    }
+
+
+    // ============================================================
+    // 시작
+    // ============================================================
+
+    // 기존 8개 먼저 표시
+    renderAllMarkers();
+
+    // Supabase 사용자 이야기 가져오기
+    loadUserStories();
+
+  </script>
 
 </body>
 </html>
